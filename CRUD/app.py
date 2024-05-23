@@ -85,12 +85,16 @@ def home():
 def user():
     if 'nik' not in session:
         return redirect(url_for('home'))
+    if 'nia' in session:
+        return redirect(url_for('admin_dashboard'))
     return redirect(url_for('user_dashboard'))
 
 @application.route('/user/dashboard')
 def user_dashboard():
     if 'nik' not in session:
         return redirect(url_for('home'))
+    if 'nia' in session:
+        return redirect(url_for('admin_dashboard'))
     nik = session['nik']
     openDb()
     cursor.execute(f"SELECT * FROM pegawai WHERE nik = '{nik}'")
@@ -102,6 +106,8 @@ def user_dashboard():
 def user_profile():
     if 'nik' not in session:
         return redirect(url_for('home'))
+    if 'nia' in session:
+        return redirect(url_for('admin_dashboard'))
     nik = session['nik']
     openDb()
     cursor.execute(f"SELECT * FROM pegawai WHERE nik = '{nik}'")
@@ -114,6 +120,8 @@ def user_profile():
 def user_messages():
     if 'nik' not in session:
         return redirect(url_for('home'))
+    if 'nia' in session:
+        return redirect(url_for('admin_dashboard'))
     # html unfinished
     return render_template('messages.html', nik=session['nik'])
 
@@ -122,6 +130,8 @@ def user_messages():
 def user_contact():
     if 'nik' not in session:
         return redirect(url_for('home'))
+    if 'nia' in session:
+        return redirect(url_for('admin_dashboard'))
     # html unfinished
     return render_template('contact.html', nik=session['nik'])   
 
@@ -130,7 +140,7 @@ def user_logout():
     session.pop('nik', None)
     return redirect(url_for('home'))
 
-#Admin Pages
+
 @application.route('/forgot', methods=['GET','POST'])
 def forgot():
     try:
@@ -215,6 +225,7 @@ def clear_session():
     session.pop('forgot', None)
     return redirect(url_for('forgot'))
 
+# Admin Pages
 #fungsi view admin_dashboard() untuk menampilkan data dari basis data
 @application.route('/admin/dashboard')
 def admin_dashboard():   
