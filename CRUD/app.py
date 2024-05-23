@@ -40,15 +40,28 @@ def closeDb():
 @application.route('/', methods=['GET','POST'])
 def home():
     try:
+        #Jika sudah login sebagai user, tidak bisa login lagi, harus logout dulu
         nik = session['nik']
     except:
         pass
     else:
         return redirect(url_for('user'))
+    
+    try:
+        #Jika sudah login sebagai admin tidak bisa ke user, harus logout baru login
+        nia = session['nia']
+    except:
+        pass
+    else:
+        return redirect(url_for('admin_dashboard'))
+    
+    try: forgot = session['forgot']
+    except: pass
+    else: return redirect(url_for('forgot_entry'))
 
     if request.method == "POST":
-        nik = request.form['nik']
-        password = request.form['password']
+        nik = request.form.get('nik')
+        password = request.form.get('password')
         cur = mysql.connection.cursor()
         
         cur.execute(f"SELECT nik, password FROM pegawai WHERE nik = '{nik}'")
@@ -63,17 +76,22 @@ def home():
         
     return render_template('home.html')
 
-# User Pages
+
+# User Pages (sudah di resolve conflictnya)
 @application.route('/user')
 def user():
     if 'nik' not in session:
         return redirect(url_for('home'))
+    if 'nia' in session:
+        return redirect(url_for('admin_dashboard'))
     return redirect(url_for('user_dashboard'))
 
 @application.route('/user/dashboard')
 def user_dashboard():
     if 'nik' not in session:
         return redirect(url_for('home'))
+    if 'nia' in session:
+        return redirect(url_for('admin_dashboard'))
     nik = session['nik']
     openDb()
     cursor.execute(f"SELECT * FROM pegawai WHERE nik = '{nik}'")
@@ -85,6 +103,8 @@ def user_dashboard():
 def user_profile():
     if 'nik' not in session:
         return redirect(url_for('home'))
+    if 'nia' in session:
+        return redirect(url_for('admin_dashboard'))
     nik = session['nik']
     openDb()
     cursor.execute(f"SELECT * FROM pegawai WHERE nik = '{nik}'")
@@ -97,6 +117,8 @@ def user_profile():
 def user_messages():
     if 'nik' not in session:
         return redirect(url_for('home'))
+    if 'nia' in session:
+        return redirect(url_for('admin_dashboard'))
     # html unfinished
     return render_template('messages.html', nik=session['nik'])
 
@@ -105,6 +127,8 @@ def user_messages():
 def user_contact():
     if 'nik' not in session:
         return redirect(url_for('home'))
+    if 'nia' in session:
+        return redirect(url_for('admin_dashboard'))
     # html unfinished
     return render_template('contact.html', nik=session['nik'])   
 
@@ -113,10 +137,99 @@ def user_logout():
     session.pop('nik', None)
     return redirect(url_for('home'))
 
-#Admin Pages
+
+@application.route('/forgot', methods=['GET','POST'])
+def forgot():
+    try:
+        #Jika sudah login sebagai user, tidak bisa login lagi, harus logout dulu
+        nik = session['nik']
+    except:
+        pass
+    else:
+        return redirect(url_for('user'))
+    
+    try:
+        #Jika sudah login sebagai admin tidak bisa ke user, harus logout baru login
+        nia = session['nia']
+    except:
+        pass
+    else:
+        return redirect(url_for('admin_dashboard'))
+    
+    try: forgot = session['forgot']
+    except: pass
+    else: return redirect(url_for('forgot_entry'))
+
+    if request.method == "POST":
+        nik = request.form['nik']
+        email = request.form['email']
+        cur = mysql.connection.cursor()
+
+        cur.execute(f"SELECT nik, email FROM pegawai WHERE nik=%s AND email=%s", (nik,email))
+        user = cur.fetchone()
+        cur.close()
+        
+        if user:
+            session['forgot'] = user[0]
+            return redirect(url_for('forgot_entry'))
+        else:
+            return render_template('forgot.html', error='Invalid nik or email!!!')
+
+    return render_template('forgot.html')
+
+@application.route('/forgot/entry',  methods=['GET','POST'])
+def forgot_entry():
+    try:
+        #Jika sudah login sebagai user, tidak bisa login lagi, harus logout dulu
+        nik = session['nik']
+    except:
+        pass
+    else:
+        return redirect(url_for('user'))
+    
+    try:
+        #Jika sudah login sebagai admin tidak bisa ke user, harus logout baru login
+        nia = session['nia']
+    except:
+        pass
+    else:
+        return redirect(url_for('admin_dashboard'))
+    
+    try: forgot = session['forgot']
+    except KeyError:return redirect(url_for('forgot'))
+
+    if request.method == "POST":
+        password = request.form['password']
+        confirm_pwd = request.form['confirm_password']
+
+        if password != confirm_pwd:
+            return render_template('forgot_entry.html', error='Passwords do not match!')
+
+        hashed_password = generate_password_hash(password) #Hash the password
+
+        cur = mysql.connection.cursor()
+        cur.execute(f"UPDATE pegawai SET password=%s WHERE nik=%s", (hashed_password, forgot))
+        mysql.connection.commit()
+        cur.close()
+
+        session.pop('forgot', None)
+        return redirect(url_for('home'))
+
+    return render_template('forgot_entry.html')
+
+@application.route('/clear_session1')
+def clear_session():
+    session.pop('forgot', None)
+    return redirect(url_for('forgot'))
+
+# Admin Pages
 #fungsi view admin_dashboard() untuk menampilkan data dari basis data
 @application.route('/admin/dashboard')
 def admin_dashboard():   
+    #Jika belum login sebagai admin tidak ke dashboard, harus login dulu
+    try: nia = session['nia']
+    except KeyError: return redirect(url_for('admin'))
+
     openDb()
     container = []
     sql = "SELECT * FROM pegawai ORDER BY NIK ASC;"
@@ -133,6 +246,26 @@ def admin():
 
 @application.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
+    try:
+        #Jika sudah login sebagai admin tidak bisa login lagi, harus logout baru login
+        nia = session['nia']
+    except:
+        pass
+    else:
+        return redirect(url_for('admin_dashboard'))
+    
+    try:
+        #Jika sudah login sebagai user, tidak bisa login sebagai admin, harus logout dulu
+        nik = session['nik']
+    except:
+        pass
+    else:
+        return redirect(url_for('user'))
+    
+    try: forgot = session['forgot']
+    except: pass
+    else: return redirect(url_for('forgot_entry'))
+
     if request.method == "POST":
         nia = request.form["nia"]
         password = request.form["password"]
@@ -147,9 +280,7 @@ def admin_login():
             session["nia"] = user[0]
             return redirect(url_for("admin_dashboard"))
         else:
-            return render_template(
-                "admin_login.html", error="Invalid NIA or password!"
-            )
+            return render_template("admin_login.html", error="Invalid NIA or password!")
     return render_template("admin_login.html")
 
 @application.route('/admin/register', methods=['GET', 'POST'])
@@ -272,6 +403,22 @@ def generate_nik():
 #fungsi view tambah() untuk membuat form tambah data
 @application.route('/tambah', methods=['GET','POST'])
 def tambah():
+    #Jika belum login sebagai admin tidak ke tambah, harus login dulu
+    try: nia = session['nia']
+    except KeyError: return redirect(url_for('admin'))
+    
+    try:
+        #Jika sudah login sebagai user, tidak bisa ke tambah, harus logout dulu
+        nik = session['nik']
+    except:
+        pass
+    else:
+        return redirect(url_for('user'))
+    
+    try: forgot = session['forgot']
+    except: pass
+    else: return redirect(url_for('forgot_entry'))
+
     generated_nik = generate_nik()  # Memanggil fungsi untuk mendapatkan NIK otomatis
     
     if request.method == 'POST':
@@ -312,6 +459,22 @@ def tambah():
 #fungsi view edit() untuk form edit data
 @application.route('/edit/<nik>', methods=['GET','POST'])
 def edit(nik):
+    #Jika belum login sebagai admin tidak ke edit, harus login dulu
+    try: nia = session['nia']
+    except KeyError: return redirect(url_for('admin'))
+    
+    try:
+        #Jika sudah login sebagai user, tidak bisa ke edit, harus logout dulu
+        nik = session['nik']
+    except:
+        pass
+    else:
+        return redirect(url_for('user'))
+    
+    try: forgot = session['forgot']
+    except: pass
+    else: return redirect(url_for('forgot_entry'))
+
     openDb()
     cursor.execute('SELECT * FROM pegawai WHERE nik=%s', (nik))
     data = cursor.fetchone()
@@ -323,23 +486,24 @@ def edit(nik):
         jeniskelamin = request.form['jeniskelamin']
         status = request.form['status']
         gaji = request.form['gaji']
-        foto = request.form['nik']
 
-        path_to_photo = os.path.join(application.root_path, UPLOAD_FOLDER, f'{nik}.jpg')
-        if os.path.exists(path_to_photo):
-            os.remove(path_to_photo)
+        # Check if a new file is uploaded
+        if 'foto' in request.files and request.files['foto'].filename != '':
+            # Remove the old photo if it exists
+            path_to_photo = os.path.join(application.root_path, UPLOAD_FOLDER, f'{nik}.jpg')
+            if os.path.exists(path_to_photo):
+                os.remove(path_to_photo)
 
-        # Pastikan direktori upload ada
-        if not os.path.exists(UPLOAD_FOLDER):
-            os.makedirs(UPLOAD_FOLDER)
-
-        # Simpan foto dengan nama NIK
-        if 'foto' in request.files:
+            # Save the new photo with the NIK name
             foto = request.files['foto']
-            if foto.filename != '':
-                foto.save(os.path.join(application.config['UPLOAD_FOLDER'], f"{nik}.jpg"))
+            foto.save(os.path.join(application.config['UPLOAD_FOLDER'], f"{nik}.jpg"))
+            foto_filename = f"{nik}.jpg"
+        else:
+            # Keep the old photo filename
+            foto_filename = data[-1]  # Assuming the last item in data is the photo filename
+
         sql = "UPDATE pegawai SET nama=%s, alamat=%s, tgllahir=%s, jeniskelamin=%s, status=%s, gaji=%s, foto=%s WHERE nik=%s"
-        val = (nama, alamat, tgllahir,jeniskelamin, status, gaji, foto, nik)
+        val = (nama, alamat, tgllahir,jeniskelamin, status, gaji, foto_filename, nik)
         cursor.execute(sql, val)
         conn.commit()
         closeDb()
