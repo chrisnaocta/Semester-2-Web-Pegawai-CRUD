@@ -77,26 +77,35 @@
                     <img id="preview" src="#" alt="Preview" style="max-width: 200px; max-height: 200px;">
         
                 <div class="submit-box">
-                    <input type="submit" value="Simpan" onclick="submitForm()">
+                    <input type="submit" value="Simpan" onclick="return confirmAndSubmit()">
                     <input type="button" value="Batal" onclick="cancel()">
                 </div>
         </form>
         
-        <script>
-            function cancel()
-            {
-                window.location.href = "{{ url_for('admin_dashboard') }}";
-            }
-
-            function submitForm()
-            {
-                document.getElementById("editForm").submit();
-            }
-
-            function previewImage(event) {
-                const img = document.getElementById('preview');
-                img.src = URL.createObjectURL(event.target.files[0]);
-            }
-        </script>
 </body>
+<script>
+    function cancel()
+    {
+        window.location.href = "{{ url_for('admin_dashboard') }}";
+    }
+
+    function confirmAndSubmit() {
+        if (confirm('Apakah Anda yakin degan perubahan data ini?'))
+        {
+            // If the user confirms, the form will be submitted
+            document.getElementById("editForm").submit();
+            return true;
+        }else
+        {
+            // If the user cancels, the form submission will be prevented
+            return false;
+        }
+    }
+
+    function previewImage(event)
+    {
+        const img = document.getElementById('preview');
+        img.src = URL.createObjectURL(event.target.files[0]);
+    }
+</script>
 </html>
