@@ -22,6 +22,7 @@ mysql = MySQL(application)
 
 #fungsi untuk menyimpan lokasi foto
 UPLOAD_FOLDER = 'E:/FILE OCTA/KULIAH/SEMESTER 2/WEB OOP/Web_Pegawai/CRUD/static/images'
+UPLOAD_FOLDER = '/static/images'
 application.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 #fungsi koneksi ke basis data
@@ -56,27 +57,63 @@ def home():
         
         if user and check_password_hash(user[1], password):
             session['nik'] = user[0]
-            return redirect(url_for('user'))
+            return redirect(url_for('user_dashboard'))
         else:
             return render_template('home.html', error='Invalid nik or password!!!')
         
     return render_template('home.html')
 
-# @application.route('/user/login', methods=['GET','POST'])
-# def user_login():
-
+# User Pages
 @application.route('/user')
 def user():
-    try: nik = session['nik']
-    except KeyError: return redirect(url_for('home'))
+    if 'nik' not in session:
+        return redirect(url_for('home'))
+    return redirect(url_for('user_dashboard'))
 
-    return render_template('user.html', nik=session['nik'])
+@application.route('/user/dashboard')
+def user_dashboard():
+    if 'nik' not in session:
+        return redirect(url_for('home'))
+    nik = session['nik']
+    openDb()
+    cursor.execute(f"SELECT * FROM pegawai WHERE nik = '{nik}'")
+    data = cursor.fetchone()
+    closeDb()
+    return render_template('user_dashboard.html', data=data, welcome=True)
+
+@application.route('/user/profile')
+def user_profile():
+    if 'nik' not in session:
+        return redirect(url_for('home'))
+    nik = session['nik']
+    openDb()
+    cursor.execute(f"SELECT * FROM pegawai WHERE nik = '{nik}'")
+    data = cursor.fetchone()
+    closeDb()
+    return render_template('user_dashboard.html', data=data, profile=True)
+
+# halaman pesan
+@application.route('/user/messages')
+def user_messages():
+    if 'nik' not in session:
+        return redirect(url_for('home'))
+    # html unfinished
+    return render_template('messages.html', nik=session['nik'])
+
+# contact page
+@application.route('/user/contact')
+def user_contact():
+    if 'nik' not in session:
+        return redirect(url_for('home'))
+    # html unfinished
+    return render_template('contact.html', nik=session['nik'])   
 
 @application.route('/user/logout')
 def user_logout():
     session.pop('nik', None)
     return redirect(url_for('home'))
 
+#Admin Pages
 #fungsi view admin_dashboard() untuk menampilkan data dari basis data
 @application.route('/admin/dashboard')
 def admin_dashboard():   
@@ -162,6 +199,7 @@ class Users(db.Model):
 
 SECRET_CODE = "1209"
 
+# other functions
 def generate_nia():
     # mendefinisikan fungsi openDb(), cursor, dan closeDb() 
     openDb()
@@ -263,7 +301,7 @@ def tambah():
 
         openDb()
         sql = "INSERT INTO pegawai (nik,password,email,nama,alamat,tgllahir,jeniskelamin,status,gaji,foto) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        val = (nik,hashed_password,email,nama,alamat,tgllahir,jeniskelamin,status,gaji,foto)
+        val = (nik,hashed_password,email,nama,alamat,tgllahir,jeniskelamin,status,gaji,nik)
         cursor.execute(sql, val)
         conn.commit()
         closeDb()
