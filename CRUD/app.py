@@ -36,6 +36,10 @@ def closeDb():
     cursor.close()
     conn.close()
 
+@application.route('/general')
+def general():
+    return render_template('general.html')
+
 @application.route('/', methods=['GET','POST'])
 def home():
     try:
@@ -378,9 +382,14 @@ def tambah():
     
     if request.method == 'POST':
         nik = request.form['nik']
+        password = request.form['password']
 
-        pwd = request.form['password']
-        hashed_password = generate_password_hash(pwd) #Hash the password
+        confirm_pwd = request.form['confirm_password']
+
+        if password != confirm_pwd:
+            return render_template('tambah.html', form_data=request.form, nik=generated_nik,error='Passwords do not match!')
+
+        hashed_password = generate_password_hash(password) #Hash the password
 
         nama = request.form['nama']
         email = request.form['email']
