@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/edit.css') }}">
+    <title>Edit Data</title>
+</head>
+<body>
+    <h1>Edit Data</h1>
+    <div class="container">
+        <div class="box" id="box-1">
+        <form action="{{ url_for('edit', nik=data[0]) }}" method="post" enctype="multipart/form-data">
+        
+                    <label for="NIK">NIK:</label>
+                <br>
+                    <input type="text" name="nik" value="{{data[0]}}" value="{{nik}}" disabled>
+                <br>
+                
+                    <label for="NAMA">Nama:</label>
+                <br>
+                    <input type="text" name="nama" value="{{data[1]}}">
+                <br>
+
+                
+                    <label for="ALAMAT">Alamat:</label>
+                <br>
+                    <input type="text" name="alamat" value="{{data[2]}}">
+                <br>
+        </div>
+        <div class="box" id="box-2">
+                    <label for="TANGGAL">Tanggal lahir:</label>
+                <br>
+                    <input type="date" name="tgllahir" value="{{data[3]}}"><br>
+                    
+            <div clas="gender-box">
+            <label for="GENDER">Jenis kelamin:</label>
+                <div class="gender-option">
+                    <div class="gender">
+                        <input type="radio" name="jeniskelamin" value="Pria" {% if data[4] == "Pria" %}checked{% endif %}>
+                        <label for="check-male">Pria</label>
+                    </div>
+                    <div class="gender">
+                        <input type="radio" name="jeniskelamin" value="Wanita" {% if data[4] == "Wanita" %}checked{% endif %}>
+                        <label for="check-female">Wanita</label>
+                    </div>
+                </div>
+            </div>
+                <br>        
+            <div class="status-box">
+                <label for="STATUS">Status menikah:</label>
+                <div class="status-option">
+                    <div class="status">
+                            <input type="radio" name="status" value="Sudah Menikah" {% if data[5] == "Sudah Menikah" %}checked{% endif %}> Sudah
+                    </div>
+                    <div class="status">
+                            <input type="radio" name="status" value="Belum Menikah" {% if data[5] == "Belum Menikah" %}checked{% endif %}> Belum
+                    </div>
+                    <div class="status">
+                        <input type="radio" name="status" value="Pisah" {% if data[5] == "Pisah" %}checked{% endif %}> Pisah
+                    </div>
+                </div>
+            </div>
+            <div class="gaji-box">
+                <label for="GAJI">Gaji:</label>
+                    <div class="gaji-input">
+                        <input type="number" name="gaji" value="{{data[6]}}">
+                    </div>
+            </div>
+        </div>
+    </div>
+                    <label for="FOTO">Foto:</label>
+                <br>    
+                    <input type="file" name="foto" accept="image/*" onchange="previewImage(event)">
+                    <input type="hidden" name="nik" value="{{ data[0] }}">
+                <br>
+                    <img id="preview" src="#" alt="Preview" style="max-width: 200px; max-height: 200px;">
+        
+                <div class="submit-box">
+                    <input type="submit" value="Simpan" onclick="submitForm()">
+                    <input type="button" value="Batal" onclick="cancel()">
+                </div>
+        </form>
+        
+        <script>
+            function cancel()
+            {
+                window.location.href = "{{ url_for('admin_dashboard') }}";
+            }
+
+            function submitForm()
+            {
+                document.getElementById("editForm").submit();
+            }
+
+            function previewImage(event) {
+                const img = document.getElementById('preview');
+                img.src = URL.createObjectURL(event.target.files[0]);
+            }
+        </script>
+</body>
+</html>

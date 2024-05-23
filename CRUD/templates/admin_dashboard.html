@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Aplikasi Kepegawaian</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/admin_dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+    <!-- Tambahkan jsPDF Library -->
+    <script src="{{ url_for('static', filename='js/jspdf.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jspdf.plugin.autotable.min.js') }}"></script>
+
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Data Kepegawaian</h2>
+        
+        <!-- Input untuk pencarian -->
+        <div class="mb-3">
+            <input type="text" id="searchInput" class="form-control" placeholder="Cari berdasarkan NIK atau Nama">
+        </div>
+        
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>NIK</th>
+                    <th>Foto</th>
+                    <th>Nama</th>
+                    <th>Alamat</th>
+                    <th>Tgl.Lahir</th>
+                    <th>Jenis.K</th>
+                    <th>Status</th>
+                    <th>Gaji</th>
+                    <th width="15%">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in container %}
+                <tr>
+                    <td>{{ row[0] }}</td>
+                    <td>
+                        <img src="{{ url_for('static', filename='images/' + row[0] + '.jpg') }}" alt="Foto {{ row[1] }}" width="70">
+                    </td>
+                    <td>{{ row[1] }}</td>
+                    <td>{{ row[2] }}</td>
+                    <td>{{ row[3].strftime('%d/%m/%Y') }}</td>
+                    <td>{{ row[4] }}</td>
+                    <td>{{ row[5] }}</td>
+                    <td style="text-align: right;">{{ "{:,.2f}".format(row[6]) }}</td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a href="#" class="btn btn-secondary print-btn" data-nik="{{ row[0] }}">Print</a>
+                            <a href="http://localhost:5000/edit/{{row[0]}}" class="btn btn-warning" role="button">Ubah</a>
+                            <a href="http://localhost:5000/hapus/{{row[0]}}" class="btn btn-danger" role="button" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">Hapus</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!-- Pagination -->
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" id="previous"><a class="page-link" href="#">Sebelumnya</a></li>
+                <li class="page-item" id="page1"><button class="page-link btn btn-link">1</button></li>
+                <li class="page-item" id="page2"><button class="page-link btn btn-link">2</button></li>
+                <li class="page-item" id="page3"><button class="page-link btn btn-link">3</button></li>
+                <li class="page-item" id="next"><a class="page-link" href="#">Selanjutnya</a></li>
+            </ul>
+        </nav>
+        
+        <a href="http://localhost:5000/tambah" class="btn btn-primary" role="button">Tambah Data</a>
+        <br>
+        <button class="logout-button btn btn-danger"><a 
+            style="text-decoration: none; color: white" href="/admin/logout">Logout</a></button>
+    </div>
+    
+    <!-- JavaScript untuk Bootstrap -->
+    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+    
+    <script>
+        var currentPage = 1;
+        var itemsPerPage = 4;
+        var totalRows = document.querySelectorAll('tbody tr').length;
+
+        function displayData(page) {
+            var startIndex = (page - 1) * itemsPerPage;
+            var endIndex = startIndex + itemsPerPage;
+
+            var rows = document.querySelectorAll('tbody tr');
+            for (var i = 0; i < rows.length; i++) {
+                if (i >= startIndex && i < endIndex) {
+                    rows[i].style.display = "";
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+        }
+
+        function updatePaginationButtons() {
+            var totalPages = Math.ceil(totalRows / itemsPerPage);
+            var page1 = document.getElementById('page1');
+            var page2 = document.getElementById('page2');
+            var page3 = document.getElementById('page3');
+
+            if (currentPage <= 3) {
+                page1.innerHTML = '<button class="page-link btn btn-link">1</button>';
+                page2.innerHTML = '<button class="page-link btn btn-link">2</button>';
+                page3.innerHTML = '<button class="page-link btn btn-link">3</button>';
+            } else {
+                page1.innerHTML = '<button class="page-link btn btn-link">' + (currentPage - 1) + '</button>';
+                page2.innerHTML = '<button class="page-link btn btn-link">' + currentPage + '</button>';
+                page3.innerHTML = '<button class="page-link btn btn-link">' + (currentPage + 1) + '</button>';
+            }
+        }
+
+        displayData(currentPage);
+        updatePaginationButtons();
+
+        document.getElementById('previous').addEventListener('click', function() {
+            if (currentPage > 1) {
+                currentPage--;
+                displayData(currentPage);
+                updatePaginationButtons();
+            }
+        });
+
+        document.getElementById('next').addEventListener('click', function() {
+            if (currentPage < Math.ceil(totalRows / itemsPerPage)) {
+                currentPage++;
+                displayData(currentPage);
+                updatePaginationButtons();
+            }
+        });
+
+        document.getElementById('page1').addEventListener('click', function() {
+            currentPage = parseInt(this.textContent);
+            displayData(currentPage);
+            updatePaginationButtons();
+        });
+
+        document.getElementById('page2').addEventListener('click', function() {
+            currentPage = parseInt(this.textContent);
+            displayData(currentPage);
+            updatePaginationButtons();
+        });
+
+        document.getElementById('page3').addEventListener('click', function() {
+            currentPage = parseInt(this.textContent);
+            displayData(currentPage);
+            updatePaginationButtons();
+        });
+
+        // Fungsi pencarian
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            var searchText = this.value.toLowerCase();
+            var rows = document.querySelectorAll('tbody tr');
+            for (var i = 0; i < rows.length; i++) {
+                var rowText = rows[i].textContent.toLowerCase();
+                if (rowText.includes(searchText)) {
+                    rows[i].style.display = "";
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+            currentPage = 1; // Reset ke halaman pertama setelah pencarian
+            updatePaginationButtons();
+        });
+
+       //fungsi untuk print ke pdf
+       function printToPDF(nik) {
+            // Mengambil data pegawai dari server berdasarkan NIK
+            fetch(`/print/${nik}`)
+            .then(response => response.json())
+            .then(data => {
+                var doc = new jsPDF();
+                
+                doc.text(70, 20, `Data Pegawai ${data.nik}`);
+                
+                // Mengubah data.tgllahir menjadi objek Date
+                var tanggalLahir = new Date(data.tgllahir);
+
+                // Format tanggal, bulan, dan tahun menjadi string terpisah
+                var tanggal = tanggalLahir.getDate();
+                // var bulan = tanggalLahir.getMonth() + 1;
+                // Menggunakan bahasa Indonesia untuk nama bulan
+                var bulan = tanggalLahir.toLocaleString('id-ID', { month: 'long' });
+                var tahun = tanggalLahir.getFullYear();
+
+                // Format tanggal, bulan, dan tahun ke dalam format DD/MM/YYYY
+                var formattedDate = `${tanggal} ${bulan} ${tahun}`;
+
+                // Format gaji ke dalam format mata uang Rupiah
+                var formattedGaji = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data.gaji);
+                
+                // Menambahkan data ke PDF berdasarkan data pegawai yang diperoleh
+                doc.text(20, 40, `NIK: ${data.nik}`);
+                doc.text(20, 50, `Nama: ${data.nama}`);
+                doc.text(20, 60, `Alamat: ${data.alamat}`);
+                doc.text(20, 70, `Tanggal Lahir: ${ formattedDate}`);
+                doc.text(20, 80, `Jenis Kelamin: ${data.jeniskelamin}`);
+                doc.text(20, 90, `Status: ${data.status}`);
+                doc.text(20, 100, `Gaji: ${formattedGaji}`);
+                        
+                // Load the image and add it to the PDF document
+                var img = new Image();
+                img.src = `E:/FILE OCTA/KULIAH/SEMESTER 2/WEB OOP/Web_Pegawai/crud/static/images/${data.foto}`; // Adjust the URL to the correct path
+                img.onload = function() {
+                    var canvas = document.createElement('canvas');
+                    var ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    var imgData = canvas.toDataURL('E:/FILE OCTA/KULIAH/SEMESTER 2/WEB OOP/Web_Pegawai/crud/static/images/');
+                    doc.addImage(imgData, 'JPG', 20, 110, 50, 50); // Adjust dimensions as needed
+                    
+                    // Save the PDF
+                    doc.save('Data-Pegawai-Gambar.pdf');
+                    
+                    // Generate pratinjau PDF sebelum menyimpan
+                    var pdfOutput = doc.output('datauristring');
+                    
+                    // Tampilkan pratinjau PDF dalam jendela baru
+                    var iframe = "<iframe width='100%' height='100%' src='" + pdfOutput + "'></iframe>";
+                    var x = window.open();
+                    x.document.open();
+                    x.document.write(iframe);
+                    x.document.close();
+                };
+
+                img.onerror = function() {
+                    console.error('Error loading image');
+                    // Jika gagal memuat gambar, simpan PDF tanpa gambar
+                    var nik_pegawai = `${data.nik}`;
+                    var filename = 'Data ' + nik_pegawai;
+                    doc.save(filename);
+                };
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Event Listener untuk tombol Print
+        var printButtons = document.querySelectorAll('.print-btn');
+        printButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                var nik = this.getAttribute('data-nik'); // Ambil NIK dari atribut data-nik tombol
+                printToPDF(nik);
+            });
+        });      
+    </script>
+</body>
+</html>

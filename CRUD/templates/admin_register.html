@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/admin_register.css') }}">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <title>Admin Register</title>
+</head>
+
+<body>
+    <div class="container">
+        <h1 style="text-align: center;">Register as Admin</h1>
+        {% if error %}
+        <p style="color: red; text-align: center; font-weight: bold;">{{error}}</p>
+        {% endif %}
+        <div class="register-box">
+            <form method="POST" action="/admin/register">
+                <div class="register-input">
+                    <label for="nia">Nomor Induk Admin (NIA):</label>
+                    <input type="text" name="nia" id="nia" value="{{nia}}" hidden>
+                    <input type="text" class="form-control" value="{{nia}}" maxlength="11" disabled readonly>
+                </div>
+                <div class="register-input">
+                    <label for="nama">Nama:</label>
+                    <input type="text" class="form-control" name="nama" id="nama" required>
+                </div>
+        
+                <div class="register-input">
+                    <label for="password">Password:</label>
+                    <input type="password" class="form-control" id="password" name="password" minlength="8" required>
+                </div>
+                <div class="register-input">
+                    <label for="code">Code:</label>
+                    <input type="number" class="form-control" id="code" name="code" minlength="4" required>
+                </div>
+                <div class="text-center register">
+                    <button class="btn btn-success login-btn text-white" type="submit">Register</button>
+                </div>
+            </form>
+        </div>
+        <div class="text-center">
+            <P>Already have an account?</p>
+                <button class="btn btn-success login-btn" >
+                    <a href="/admin/login" class="text-white">Login as Admin</a>
+                </button>
+        </div>
+    </div>
+</body>
+
+</html>
