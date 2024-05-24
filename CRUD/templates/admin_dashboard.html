@@ -5,6 +5,7 @@
 
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css2/admin_dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/admin_dashboard.css') }}">
     <!-- Tambahkan jsPDF Library -->
     <script src="{{ url_for('static', filename='js/jspdf.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jspdf.plugin.autotable.min.js') }}"></script>
@@ -20,9 +21,17 @@
     </style>
 </head>
 <body>
+         <!-- Side navigation -->
+  <div class="sidenav">
+    <a {% if dashboard %}class="checked"{% endif %} href="/admin/dashboard">Home</a>
+    <a {% if profile %}class="checked"{% endif %} href="/admin/profile">Profile</a>
+    <a {% if messages %}class="checked"{% endif %} href="/admin/messages">Messages</a>
+    <a {% if contact %}class="checked"{% endif %} href="/admin/contact">Contact</a>
+    <a href="/admin/logout">Log Out</a>
+  </div>
+  <div class="main">
     <div class="container">
         <h2>Data Kepegawaian</h2>
-        
         <!-- Input untuk pencarian -->
         <div class="mb-3">
             <input type="text" id="searchInput" class="form-control" placeholder="Cari berdasarkan NIK atau Nama">
@@ -77,13 +86,18 @@
                 <li class="page-item" id="next"><a class="page-link" href="#">Selanjutnya</a></li>
             </ul>
         </nav>
+<<<<<<< HEAD
         
         <a href="http://localhost:5000/tambah" class="btn btn-primary" role="button">Tambah Data</a>
         <br>
         <button class="logout-button btn btn-danger">
             <a style="text-decoration: none; color: white" href="/admin/logout" onclick="return confirm('Anda yakin mau logout?')" >Logout</a>
         </button>
+=======
+        <a class="right btn btn-primary" href="/tambah">Tambah Data</a>
+>>>>>>> 6a2a3e2f3ebe6ed52c0ac6678b58e1255d7042c6
     </div>
+  </div>
     
     <!-- JavaScript untuk Bootstrap -->
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>

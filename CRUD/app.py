@@ -122,8 +122,15 @@ def user_messages():
         return redirect(url_for('home'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
-    # html unfinished
-    return render_template('messages.html', nik=session['nik'])
+    
+    openDb()
+    container = []
+    cursor.execute(f"SELECT * FROM pesan")
+    result = cursor.fetchall()
+    for message in result:
+        container.append(message)
+    closeDb()
+    return render_template('user_messages.html', container=container, nik=session['nik'])
 
 # contact page
 @application.route('/user/contact')
@@ -230,9 +237,9 @@ def clear_session():
 @application.route('/admin/dashboard')
 def admin_dashboard():   
     #Jika belum login sebagai admin tidak ke dashboard, harus login dulu
-    try: nia = session['nia']
-    except KeyError: return redirect(url_for('admin'))
-
+    if 'nia' not in session:
+        return redirect(url_for('admin_login'))
+    nia = session['nia']
     openDb()
     container = []
     sql = "SELECT * FROM pegawai ORDER BY NIK ASC;"
@@ -240,34 +247,26 @@ def admin_dashboard():
     results = cursor.fetchall()
     for data in results:
         container.append(data)
+    sql = f"SELECT nama FROM admin where nia = '{nia}'"
+    cursor.execute(sql)
+    admin = cursor.fetchone()
     closeDb()
-    return render_template('admin_dashboard.html', container=container)
+    return render_template('admin_dashboard.html', container=container, admin=admin[0], dashboard=True)
 
-@application.route('/admin')
+@application.route('/admin/')
 def admin():
+    if 'nia' in session:
+        return redirect(url_for('admin_dashboard'))
     return redirect(url_for('admin_login'))
 
 @application.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
-    try:
-        #Jika sudah login sebagai admin tidak bisa login lagi, harus logout baru login
-        nia = session['nia']
-    except:
-        pass
-    else:
-        return redirect(url_for('admin_dashboard'))
-    
-    try:
-        #Jika sudah login sebagai user, tidak bisa login sebagai admin, harus logout dulu
-        nik = session['nik']
-    except:
-        pass
-    else:
+    if 'nia' in session:
+        return redirect(url_for('admin'))
+    if 'nik' in session:
         return redirect(url_for('user'))
-    
-    try: forgot = session['forgot']
-    except: pass
-    else: return redirect(url_for('forgot_entry'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
 
     if request.method == "POST":
         nia = request.form["nia"]
@@ -315,6 +314,10 @@ def admin_register():
         return redirect(url_for("admin_login"))
     
     return render_template('admin_register.html', nia=generated_nia)
+
+@application.route('/admin/messages/')
+def admin_messages():
+    return render_template('admin_messages.html')
 
 @application.route('/admin/logout')
 def admin_logout():
@@ -412,21 +415,12 @@ def generate_nik():
 #fungsi view tambah() untuk membuat form tambah data
 @application.route('/tambah', methods=['GET','POST'])
 def tambah():
-    #Jika belum login sebagai admin tidak ke tambah, harus login dulu
-    try: nia = session['nia']
-    except KeyError: return redirect(url_for('admin'))
-    
-    try:
-        #Jika sudah login sebagai user, tidak bisa ke tambah, harus logout dulu
-        nik = session['nik']
-    except:
-        pass
-    else:
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
+    if 'nik' in session:
         return redirect(url_for('user'))
-    
-    try: forgot = session['forgot']
-    except: pass
-    else: return redirect(url_for('forgot_entry'))
+    if 'nia' not in session:
+        return redirect(url_for('admin_login'))
 
     generated_nik = generate_nik()  # Memanggil fungsi untuk mendapatkan NIK otomatis
     
