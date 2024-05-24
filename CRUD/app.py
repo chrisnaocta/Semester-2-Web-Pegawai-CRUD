@@ -21,8 +21,8 @@ db = SQLAlchemy(application)
 mysql = MySQL(application)
 
 #fungsi untuk menyimpan lokasi foto
-UPLOAD_FOLDER = 'E:/FILE OCTA/KULIAH/SEMESTER 2/WEB OOP/Web_Pegawai/CRUD/static/images'
-UPLOAD_FOLDER = '/static/images'
+UPLOAD_FOLDER = 'E:\FILE OCTA\KULIAH\SEMESTER 2\WEB OOP\Web_Pegawai\CRUD\static\images'
+# UPLOAD_FOLDER = '/static/images'
 application.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 #fungsi koneksi ke basis data
@@ -310,13 +310,19 @@ def admin_register():
     if request.method == "POST":
         nia = request.form["nia"]
         nama = request.form["nama"]
-        password = request.form["password"]
-        code = request.form["code"]
 
+        password = request.form['password']
+
+        confirm_pwd = request.form['confirm_password']
+
+        if password != confirm_pwd:
+            return render_template('admin_register.html', nia=generated_nia, error='Passwords do not match!')
+
+        hashed_password = generate_password_hash(password) #Hash the password
+
+        code = request.form["code"]
         if code != SECRET_CODE:
             return render_template('admin_register.html', nia=generated_nia, error="Wrong Code.")
-        
-        hashed_password = generate_password_hash(password)  # Hash the password
 
         openDb()
         # SQL SYNTAX untuk memasukan username dan password di tabel karyawan

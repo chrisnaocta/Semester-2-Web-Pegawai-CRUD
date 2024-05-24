@@ -1,0 +1,25 @@
+.container
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 40px;
+}       
+
+.card {
+    width: 100%;
+    max-width: 1000px;
+    height: 733px;
+    margin: 0;
+    padding: 0;
+}
+
+/* .card-warning:not(.card-outline)>.card-footer {
+    background-color: #030303;
+} */
+
+.card-footer
+{
+    width: 100%;
+}
