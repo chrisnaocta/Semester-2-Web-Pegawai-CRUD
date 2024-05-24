@@ -21,8 +21,8 @@ db = SQLAlchemy(application)
 mysql = MySQL(application)
 
 #fungsi untuk menyimpan lokasi foto
-UPLOAD_FOLDER = 'E:\FILE OCTA\KULIAH\SEMESTER 2\WEB OOP\Web_Pegawai\CRUD\static\images'
-# UPLOAD_FOLDER = '/static/images'
+# UPLOAD_FOLDER = 'E:\FILE OCTA\KULIAH\SEMESTER 2\WEB OOP\Web_Pegawai\CRUD\static\images'
+UPLOAD_FOLDER = '/static/images'
 application.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 #fungsi koneksi ke basis data
@@ -43,25 +43,12 @@ def general():
 
 @application.route('/', methods=['GET','POST'])
 def home():
-    try:
-        #Jika sudah login sebagai user, tidak bisa login lagi, harus logout dulu
-        nik = session['nik']
-    except:
-        pass
-    else:
+    if 'nik' in session:
         return redirect(url_for('user'))
-    
-    try:
-        #Jika sudah login sebagai admin tidak bisa ke user, harus logout baru login
-        nia = session['nia']
-    except:
-        pass
-    else:
+    if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
-    
-    try: forgot = session['forgot']
-    except: pass
-    else: return redirect(url_for('forgot_entry'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
 
     if request.method == "POST":
         nik = request.form.get('nik')
@@ -83,18 +70,18 @@ def home():
 # User Pages
 @application.route('/user/')
 def user():
-    if 'nik' not in session:
-        return redirect(url_for('home'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
+    if 'nik' not in session:
+        return redirect(url_for('home'))
     return redirect(url_for('user_dashboard'))
 
 @application.route('/user/dashboard/')
 def user_dashboard():
-    if 'nik' not in session:
-        return redirect(url_for('home'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
+    if 'nik' not in session:
+        return redirect(url_for('home'))
     nik = session['nik']
     openDb()
     cursor.execute(f"SELECT * FROM pegawai WHERE nik = '{nik}'")
@@ -104,10 +91,10 @@ def user_dashboard():
 
 @application.route('/user/profile/')
 def user_profile():
-    if 'nik' not in session:
-        return redirect(url_for('home'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
+    if 'nik' not in session:
+        return redirect(url_for('home'))
     nik = session['nik']
     openDb()
     cursor.execute(f"SELECT * FROM pegawai WHERE nik = '{nik}'")
@@ -118,10 +105,10 @@ def user_profile():
 # halaman pesan
 @application.route('/user/messages/')
 def user_messages():
-    if 'nik' not in session:
-        return redirect(url_for('home'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
+    if 'nik' not in session:
+        return redirect(url_for('home'))
     
     openDb()
     container = []
@@ -134,6 +121,10 @@ def user_messages():
 
 @application.route('/user/messages/<kode>/')
 def user_message(kode):
+    if 'nia' in session:
+        return redirect(url_for('admin_dashboard'))
+    if 'nik' not in session:
+        return redirect(url_for('home'))
     openDb()
     cursor.execute(f"SELECT * FROM pesan WHERE kode = '{kode}'")
     pesan = cursor.fetchone()
@@ -146,10 +137,10 @@ def user_message(kode):
 # contact page
 @application.route('/user/contact/')
 def user_contact():
-    if 'nik' not in session:
-        return redirect(url_for('home'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
+    if 'nik' not in session:
+        return redirect(url_for('home'))
     # html unfinished
     return render_template('contact.html', nik=session['nik'])   
 
@@ -161,25 +152,12 @@ def user_logout():
 
 @application.route('/forgot/', methods=['GET','POST'])
 def forgot():
-    try:
-        #Jika sudah login sebagai user, tidak bisa login lagi, harus logout dulu
-        nik = session['nik']
-    except:
-        pass
-    else:
+    if 'nik' in session:
         return redirect(url_for('user'))
-    
-    try:
-        #Jika sudah login sebagai admin tidak bisa ke user, harus logout baru login
-        nia = session['nia']
-    except:
-        pass
-    else:
+    if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
-    
-    try: forgot = session['forgot']
-    except: pass
-    else: return redirect(url_for('forgot_entry'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
 
     if request.method == "POST":
         nik = request.form['nik']
@@ -200,24 +178,12 @@ def forgot():
 
 @application.route('/forgot/entry/',  methods=['GET','POST'])
 def forgot_entry():
-    try:
-        #Jika sudah login sebagai user, tidak bisa login lagi, harus logout dulu
-        nik = session['nik']
-    except:
-        pass
-    else:
+    if 'nik' in session:
         return redirect(url_for('user'))
-    
-    try:
-        #Jika sudah login sebagai admin tidak bisa ke user, harus logout baru login
-        nia = session['nia']
-    except:
-        pass
-    else:
+    if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
-    
-    try: forgot = session['forgot']
-    except KeyError:return redirect(url_for('forgot'))
+    if 'forgot' not in session:
+        return redirect(url_for('forgot'))
 
     if request.method == "POST":
         password = request.form['password']
@@ -246,16 +212,24 @@ def clear_session():
 # Admin Pages
 @application.route('/admin/')
 def admin():
+    if 'nik' in session:
+        return redirect(url_for('user'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
     return redirect(url_for('admin_login'))
 
 #fungsi view admin_dashboard() untuk menampilkan data dari basis data
 @application.route('/admin/dashboard/')
 def admin_dashboard():   
-    #Jika belum login sebagai admin tidak ke dashboard, harus login dulu
+    if 'nik' in session:
+        return redirect(url_for('user'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
     if 'nia' not in session:
         return redirect(url_for('admin_login'))
+    
     nia = session['nia']
     openDb()
     container = []
