@@ -44,9 +44,9 @@
             <tbody>
                 {% for row in container %}
                 <tr>
-                    <td>{{ row[3].strftime('%d/%m/%Y') }}</td>
-                    <td>{{ row[4] }}</td>
-                    <td>{{ row[2] }}</td>
+                    <td>{{ row[2].strftime('%d/%m/%Y') }}</td>
+                    <td>{{ row[3] }}</td>
+                    <td>{{ row[1] }}</td>
                     <td>
                         <div class="btn-group" role="group">
                             <a href="/admin/messages/edit/{{row[0]}}" class="btn btn-warning" role="button">Edit</a>

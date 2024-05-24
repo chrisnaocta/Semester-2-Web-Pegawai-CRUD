@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_mysqldb import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
 
-import pymysql.cursors, os, datetime
+import pymysql.cursors, os, datetime, random, string
 
 application = Flask(__name__)
 conn = cursor = None
@@ -81,7 +81,7 @@ def home():
     return render_template('home.html')
 
 # User Pages
-@application.route('/user')
+@application.route('/user/')
 def user():
     if 'nik' not in session:
         return redirect(url_for('home'))
@@ -89,7 +89,7 @@ def user():
         return redirect(url_for('admin_dashboard'))
     return redirect(url_for('user_dashboard'))
 
-@application.route('/user/dashboard')
+@application.route('/user/dashboard/')
 def user_dashboard():
     if 'nik' not in session:
         return redirect(url_for('home'))
@@ -102,7 +102,7 @@ def user_dashboard():
     closeDb()
     return render_template('user_dashboard.html', data=data, welcome=True)
 
-@application.route('/user/profile')
+@application.route('/user/profile/')
 def user_profile():
     if 'nik' not in session:
         return redirect(url_for('home'))
@@ -116,7 +116,7 @@ def user_profile():
     return render_template('user_dashboard.html', data=data, profile=True)
 
 # halaman pesan
-@application.route('/user/messages')
+@application.route('/user/messages/')
 def user_messages():
     if 'nik' not in session:
         return redirect(url_for('home'))
@@ -132,8 +132,19 @@ def user_messages():
     closeDb()
     return render_template('user_messages.html', container=container, nik=session['nik'])
 
+@application.route('/user/messages/<kode>/')
+def user_message(kode):
+    openDb()
+    cursor.execute(f"SELECT * FROM pesan WHERE kode = '{kode}'")
+    pesan = cursor.fetchone()
+    if not pesan:
+        return redirect(url_for('user_messages'))
+    isi = pesan[4].split("\n")
+    closeDb()
+    return render_template('user_message.html', pesan=pesan, isi=isi)
+
 # contact page
-@application.route('/user/contact')
+@application.route('/user/contact/')
 def user_contact():
     if 'nik' not in session:
         return redirect(url_for('home'))
@@ -142,13 +153,13 @@ def user_contact():
     # html unfinished
     return render_template('contact.html', nik=session['nik'])   
 
-@application.route('/user/logout')
+@application.route('/user/logout/')
 def user_logout():
     session.pop('nik', None)
     return redirect(url_for('home'))
 
 
-@application.route('/forgot', methods=['GET','POST'])
+@application.route('/forgot/', methods=['GET','POST'])
 def forgot():
     try:
         #Jika sudah login sebagai user, tidak bisa login lagi, harus logout dulu
@@ -187,7 +198,7 @@ def forgot():
 
     return render_template('forgot.html')
 
-@application.route('/forgot/entry',  methods=['GET','POST'])
+@application.route('/forgot/entry/',  methods=['GET','POST'])
 def forgot_entry():
     try:
         #Jika sudah login sebagai user, tidak bisa login lagi, harus logout dulu
@@ -227,14 +238,20 @@ def forgot_entry():
 
     return render_template('forgot_entry.html')
 
-@application.route('/clear_session1')
+@application.route('/clear_session1/')
 def clear_session():
     session.pop('forgot', None)
     return redirect(url_for('forgot'))
 
 # Admin Pages
+@application.route('/admin/')
+def admin():
+    if 'nia' in session:
+        return redirect(url_for('admin_dashboard'))
+    return redirect(url_for('admin_login'))
+
 #fungsi view admin_dashboard() untuk menampilkan data dari basis data
-@application.route('/admin/dashboard')
+@application.route('/admin/dashboard/')
 def admin_dashboard():   
     #Jika belum login sebagai admin tidak ke dashboard, harus login dulu
     if 'nia' not in session:
@@ -253,11 +270,6 @@ def admin_dashboard():
     closeDb()
     return render_template('admin_dashboard.html', container=container, admin=admin[0], dashboard=True)
 
-@application.route('/admin/')
-def admin():
-    if 'nia' in session:
-        return redirect(url_for('admin_dashboard'))
-    return redirect(url_for('admin_login'))
 
 @application.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
@@ -287,6 +299,12 @@ def admin_login():
 
 @application.route('/admin/register', methods=['GET', 'POST'])
 def admin_register():
+    if 'nia' in session:
+        return redirect(url_for('admin'))
+    if 'nik' in session:
+        return redirect(url_for('user'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
     generated_nia = generate_nia()
 
     if request.method == "POST":
@@ -311,7 +329,37 @@ def admin_register():
 
 @application.route('/admin/messages/')
 def admin_messages():
+    if 'nik' in session:
+        return redirect(url_for('user'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
+    if 'nia' not in session:
+        return redirect(url_for('admin_login'))
     return render_template('admin_messages.html')
+
+@application.route('/admin/tambah_pesan/', methods=['GET', 'POST'])
+def admin_tambah_pesan():
+    if 'nik' in session:
+        return redirect(url_for('user'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
+    if 'nia' not in session:
+        return redirect(url_for('admin_login'))
+    
+    kode = generate_pesan()
+
+    if request.method == 'POST':
+        openDb()
+        cursor.execute(f"SELECT * FROM admin WHERE nia = '{session['nia']}'")
+        admin = cursor.fetchone()
+        author  = admin[1]
+        tgl = datetime.date.today()
+        judul = request.form['judul']
+        isi = request.form['isi']
+
+        closeDb()
+
+    return render_template('admin_pesan.html')
 
 @application.route('/admin/logout')
 def admin_logout():
@@ -405,6 +453,22 @@ def generate_nik():
     closeDb()  # untuk menutup koneksi database 
     
     return next_nik
+
+# membuat kode pesan otomatis
+def generate_pesan():
+
+    openDb()
+    LENGTH = 8
+
+    while True:
+        characters = string.ascii_letters + string.digits
+        generated_string = ''.join(random.choices(characters, k=LENGTH))
+        cursor.execute(f"SELECT kode FROM pesan WHERE kode = '{generated_string}'")
+        temp = cursor.fetchone()
+        if not temp[0]:
+            break
+    closeDb()
+    return generated_string
 
 #fungsi view tambah() untuk membuat form tambah data
 @application.route('/tambah', methods=['GET','POST'])
