@@ -80,8 +80,9 @@
         
         <a href="http://localhost:5000/tambah" class="btn btn-primary" role="button">Tambah Data</a>
         <br>
-        <button class="logout-button btn btn-danger"><a 
-            style="text-decoration: none; color: white" href="/admin/logout">Logout</a></button>
+        <button class="logout-button btn btn-danger">
+            <a style="text-decoration: none; color: white" href="/admin/logout" onclick="return confirm('Anda yakin mau logout?')" >Logout</a>
+        </button>
     </div>
     
     <!-- JavaScript untuk Bootstrap -->
