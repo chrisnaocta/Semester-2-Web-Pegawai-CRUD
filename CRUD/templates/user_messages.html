@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/user.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/dashboard.css') }}">
+    <title>Welcome</title>
+</head>
+<body>
+     <!-- Side navigation -->
+  <div class="sidenav">
+    <a {% if profile %}class="checked"{% endif %} href="/user/profile">Profile</a>
+    <a {% if messages %}class="checked"{% endif %} href="/user/messages">Messages</a>
+    <a {% if contact %}class="checked"{% endif %} href="/user/contact">Contact</a>
+    <a href="/user/logout">Log Out</a>
+  </div>
+  
+  <!-- Page content -->
+  <div class="main">
+    <div class="container">
+      <h2>Inbox</h2>
+      <table class="table table-bordered table-hover">
+          <thead>
+              <tr>
+                  <th>Tgl</th>
+                  <th>Judul</th>
+                  <th>Author</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for row in container %}
+              <tr>
+                  <td>{{ row[3].strftime('%d/%m/%Y') }}</td>
+                  <td>{{ row[4] }}</td>
+                  <td>{{ row[2] }}</td>
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+      
+      <!-- Pagination -->
+      <nav aria-label="Page navigation example">
+          <ul class="pagination justify-content-center">
+              <li class="page-item" id="previous"><a class="page-link" href="#">Sebelumnya</a></li>
+              <li class="page-item" id="page1"><button class="page-link btn btn-link">1</button></li>
+              <li class="page-item" id="page2"><button class="page-link btn btn-link">2</button></li>
+              <li class="page-item" id="page3"><button class="page-link btn btn-link">3</button></li>
+              <li class="page-item" id="next"><a class="page-link" href="#">Selanjutnya</a></li>
+          </ul>
+      </nav>
+  </div>
+  </div> 
+</body>
+</html>

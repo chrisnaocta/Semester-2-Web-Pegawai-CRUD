@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/user.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/dashboard.css') }}">
     {% if welcome %}
     <title>Welcome</title>
@@ -23,7 +22,7 @@
   <!-- Page content -->
   <div class="main">
         {% if welcome %}
-        <h1>Welcome, {{data[1]}}</h1>
+        <h1>Welcome, {{ data[1] }}</h1>
         <h2>You are already logged in</h2>
         {% endif %}
         <div>
