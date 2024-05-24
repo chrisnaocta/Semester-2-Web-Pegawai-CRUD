@@ -122,8 +122,15 @@ def user_messages():
         return redirect(url_for('home'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
-    # html unfinished
-    return render_template('messages.html', nik=session['nik'])
+    
+    openDb()
+    container = []
+    cursor.execute(f"SELECT * FROM pesan")
+    result = cursor.fetchall()
+    for message in result:
+        container.append(message)
+    closeDb()
+    return render_template('user_messages.html', container=container, nik=session['nik'])
 
 # contact page
 @application.route('/user/contact')
@@ -301,6 +308,10 @@ def admin_register():
         return redirect(url_for("admin_login"))
     
     return render_template('admin_register.html', nia=generated_nia)
+
+@application.route('/admin/messages/')
+def admin_messages():
+    return render_template('admin_messages.html')
 
 @application.route('/admin/logout')
 def admin_logout():

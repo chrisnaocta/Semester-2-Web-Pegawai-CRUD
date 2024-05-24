@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/user.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/dashboard.css') }}">
-    <title>Welcome</title>
+    <title>Messages</title>
 </head>
 <body>
      <!-- Side navigation -->
@@ -19,13 +19,13 @@
   <!-- Page content -->
   <div class="main">
     <div class="container">
-      <h2>Inbox</h2>
+      <h2>Messages</h2>
       <table class="table table-bordered table-hover">
           <thead>
               <tr>
-                  <th>Tgl</th>
-                  <th>Judul</th>
-                  <th>Author</th>
+                  <th width="10%">Date</th>
+                  <th>Title</th>
+                  <th width="20%">Author</th>
               </tr>
           </thead>
           <tbody>
