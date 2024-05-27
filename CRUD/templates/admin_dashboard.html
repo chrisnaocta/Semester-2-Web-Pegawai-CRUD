@@ -26,7 +26,7 @@
     <a {% if dashboard %}class="checked"{% endif %} href="/admin/dashboard">Home</a>
     <a {% if profile %}class="checked"{% endif %} href="/admin/profile">Profile</a>
     <a {% if messages %}class="checked"{% endif %} href="/admin/messages">Messages</a>
-    <a href="/admin/logout">Log Out</a>
+    <a href="/admin/logout" onclick="return confirm('Anda yakin mau logout?')">Log Out</a>
   </div>
   <div class="main">
     <div class="container">
@@ -66,8 +66,8 @@
                     <td>
                         <div class="btn-group" role="group">
                             <a href="#" class="btn btn-secondary print-btn" data-nik="{{ row[0] }}">Print</a>
-                            <a href="http://localhost:5000/edit/{{row[0]}}" class="btn btn-warning" role="button">Ubah</a>
-                            <a href="http://localhost:5000/hapus/{{row[0]}}" class="btn btn-danger" role="button" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">Hapus</a>
+                            <a href="http://localhost:5000/admin/edit/{{row[0]}}" class="btn btn-warning" role="button">Ubah</a>
+                            <a href="http://localhost:5000/admin/hapus/{{row[0]}}" class="btn btn-danger" role="button" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">Hapus</a>
                         </div>
                     </td>
                 </tr>
@@ -85,7 +85,12 @@
                 <li class="page-item" id="next"><a class="page-link" href="#">Selanjutnya</a></li>
             </ul>
         </nav>
+<<<<<<< HEAD
+        
+        <a href="http://localhost:5000/admin/tambah" class="btn btn-primary" role="button">Tambah Data</a>
+=======
         <a class="right btn btn-primary" href="/admin/tambah">Tambah Data</a>
+>>>>>>> f37cbf07db1ca07322e0de15c11609b6f2e95a3a
     </div>
   </div>
     

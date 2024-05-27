@@ -409,7 +409,6 @@ def admin_logout():
     session.pop('nia', None)
     return redirect(url_for('home'))
 
-
 #fungsi view tambah() untuk membuat form tambah data
 @application.route('/admin/tambah/', methods=['GET','POST'])
 def tambah():
@@ -475,7 +474,6 @@ def hapus(nik):
     conn.commit()
     closeDb()
     return redirect(url_for('admin_dashboard'))
-
     
 #fungsi view edit() untuk form edit data
 @application.route('/edit/<nik>', methods=['GET','POST'])
@@ -496,6 +494,64 @@ def edit(nik):
     except: pass
     else: return redirect(url_for('forgot_entry'))
 
+    openDb()
+    cursor.execute('SELECT * FROM pegawai WHERE nik=%s', (nik))
+    data = cursor.fetchone()
+    if request.method == 'POST':
+        nama = request.form['nama']
+        alamat = request.form['alamat']
+        tgllahir = request.form['tgllahir']
+        jeniskelamin = request.form['jeniskelamin']
+        status = request.form['status']
+        gaji = request.form['gaji']
+
+        password = request.form['password']
+
+        confirm_pwd = request.form['confirm_password']
+
+        if password != confirm_pwd:
+            return render_template('tambah.html', form_data=request.form, error='Passwords do not match!')
+
+        hashed_password = generate_password_hash(password) #Hash the password
+
+        # Check if a new file is uploaded
+        if 'foto' in request.files and request.files['foto'].filename != '':
+            # Remove the old photo if it exists
+            path_to_photo = os.path.join(application.root_path, UPLOAD_FOLDER, f'{nik}.jpg')
+            if os.path.exists(path_to_photo):
+                os.remove(path_to_photo)
+
+            # Save the new photo with the NIK name
+            foto = request.files['foto']
+            foto.save(os.path.join(application.config['UPLOAD_FOLDER'], f"{nik}.jpg"))
+            foto_filename = f"{nik}.jpg"
+        else:
+            # Keep the old photo filename
+            foto_filename = data[0]  # Assuming the last item in data is the photo filename
+
+        sql = "UPDATE pegawai SET nama=%s, foto=%s , password=%s, alamat=%s, tgllahir=%s, jeniskelamin=%s, status=%s, gaji=%s, foto=%s WHERE nik=%s"
+        val = (nama, foto_filename ,hashed_password, alamat, tgllahir,jeniskelamin, status, gaji, foto_filename, nik)
+        cursor.execute(sql, val)
+        conn.commit()
+        closeDb()
+        return redirect(url_for('admin_dashboard'))
+    else:
+        closeDb()
+        return render_template('edit.html', data=data)
+
+#fungsi menghapus data
+@application.route('/admin/hapus/<nik>', methods=['GET','POST'])
+def hapus(nik):
+    openDb()
+    cursor.execute('DELETE FROM pegawai WHERE nik=%s', (nik,))
+    # Hapus foto berdasarkan NIK
+    path_to_photo = os.path.join(application.root_path, UPLOAD_FOLDER, f'{nik}.jpg')
+    if os.path.exists(path_to_photo):
+        os.remove(path_to_photo)
+
+    conn.commit()
+    closeDb()
+    return redirect(url_for('admin_dashboard'))
 
 #fungsi cetak ke PDF
 @application.route('/print/<nik>', methods=['GET'])
@@ -617,7 +673,6 @@ def generate_nik():
     closeDb()  # untuk menutup koneksi database 
     
     return next_nik
-
 
 # membuat kode pesan otomatis
 def generate_pesan():
