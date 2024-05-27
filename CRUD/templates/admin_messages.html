@@ -21,13 +21,13 @@
     </style>
 </head>
 <body>
-         <!-- Side navigation -->
-  <div class="sidenav">
-    <a {% if dashboard %}class="checked"{% endif %} href="/admin/dashboard">Home</a>
-    <a {% if profile %}class="checked"{% endif %} href="/admin/profile">Profile</a>
-    <a {% if messages %}class="checked"{% endif %} href="/admin/messages">Messages</a>
-    <a href="/admin/logout">Log Out</a>
-  </div>
+    <!-- Side navigation -->
+    <div class="sidenav">
+        <a {% if home %}class="checked"{% endif %} href="/admin">Home</a>
+        <a {% if profile %}class="checked"{% endif %} href="/admin/profile">Profile</a>
+        <a {% if messages %}class="checked"{% endif %} href="/admin/messages">Messages</a>
+        <a href="/admin/logout" onclick="return confirm('Anda yakin mau logout?')">Log Out</a>
+    </div>
   <div class="main">
     <div class="container">
         <h2>Messages</h2>
