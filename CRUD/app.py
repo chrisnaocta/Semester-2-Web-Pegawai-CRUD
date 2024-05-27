@@ -105,7 +105,7 @@ def user_profile():
     cursor.execute(f"SELECT * FROM pegawai WHERE nik = '{nik}'")
     data = cursor.fetchone()
     closeDb()
-    return render_template('user_dashboard.html', data=data, profile=True)
+    return render_template('user_profile.html', data=data, profile=True)
 
 # halaman pesan
 @application.route('/user/messages/')
@@ -124,7 +124,7 @@ def user_messages():
     for message in result:
         container.append(message)
     closeDb()
-    return render_template('user_messages.html', container=container, nik=session['nik'], message=True)
+    return render_template('user_messages.html', container=container, nik=session['nik'], messages=True)
 
 @application.route('/user/messages/<kode>/')
 def user_message(kode):
@@ -141,7 +141,7 @@ def user_message(kode):
         return redirect(url_for('user_messages'))
     isi = pesan[4].split("\n")
     closeDb()
-    return render_template('user_message.html', pesan=pesan, isi=isi, message=True)
+    return render_template('user_message.html', pesan=pesan, isi=isi, messages=True)
 
 # contact page
 @application.route('/user/contact/')
@@ -335,7 +335,7 @@ def admin_messages():
     for message in result:
         container.append(message)
     closeDb()
-    return render_template('admin_messages.html', container=container, message=True)
+    return render_template('admin_messages.html', container=container, messages=True)
 
 @application.route('/admin/messages/<kode>/')
 def admin_message(kode):
@@ -352,7 +352,7 @@ def admin_message(kode):
         return redirect(url_for('admin_messages'))
     isi = pesan[4].split("\n")
     closeDb()
-    return render_template('admin_message.html', pesan=pesan, isi=isi, message=True)
+    return render_template('admin_message.html', pesan=pesan, isi=isi, messages=True)
 
 @application.route('/admin/tambah_pesan/', methods=['GET', 'POST'])
 def admin_tambah_pesan():
@@ -379,7 +379,7 @@ def admin_tambah_pesan():
         conn.commit()
         closeDb()
         return redirect(url_for('admin_messages'))
-    return render_template('admin_tambah_pesan.html', message=True)
+    return render_template('admin_tambah_pesan.html', messages=True)
 
 @application.route('/admin/messages/edit/<kode>', methods=['GET', 'POST'])
 def admin_edit_pesan(kode):
@@ -407,7 +407,7 @@ def admin_edit_pesan(kode):
         conn.commit()
         closeDb()
         return redirect(url_for('admin_messages'))
-    return render_template('admin_edit_pesan.html', pesan=pesan, message=True)
+    return render_template('admin_edit_pesan.html', pesan=pesan, messages=True)
 
 @application.route('/admin/messages/hapus/<kode>')
 def admin_hapus_pesan(kode):

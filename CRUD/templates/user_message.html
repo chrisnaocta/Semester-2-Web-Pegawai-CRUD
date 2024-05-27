@@ -19,15 +19,12 @@
   <!-- Page content -->
   <div class="main">
     <div class="container">
-      <h2>Message</h2>
+      <a href="/user/messages">← Back to Messages</a>
       <h3>{{pesan[3]}}</h3>
         <p>Posted on {{pesan[2]}} by {{pesan[1]}}</p> <br>
         {% for line in isi %}
         <p>{{line}}</p>
         {% endfor %}
-        <div>
-          <a href="/user/messages" class="btn btn-secondary">Back</a>
-        </div>
   </div>
   </div> 
 </body>
