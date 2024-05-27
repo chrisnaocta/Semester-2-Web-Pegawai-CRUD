@@ -381,7 +381,7 @@ def admin_tambah_pesan():
         return redirect(url_for('admin_messages'))
     return render_template('admin_tambah_pesan.html')
 
-@application.route('/admin/messages/edit/<kode>')
+@application.route('/admin/messages/edit/<kode>', methods=['GET', 'POST'])
 def admin_edit_pesan(kode):
     if 'nik' in session:
         return redirect(url_for('user'))
@@ -389,6 +389,26 @@ def admin_edit_pesan(kode):
         return redirect(url_for('forgot_entry'))
     if 'nia' not in session:
         return redirect(url_for('admin_login'))   
+    
+    openDb()
+    cursor.execute('SELECT * FROM pesan WHERE kode=%s', (kode))
+    pesan = cursor.fetchone()
+
+    if request.method == "POST":
+        cursor.execute(f"SELECT * FROM admin WHERE nia = '{session['nia']}'")
+        admin = cursor.fetchone()
+        author  = admin[1]
+        tgl = datetime.date.today()
+        judul = request.form['judul']
+        isi = request.form['isi']
+
+        sql = f"UPDATE pesan SET author='{author}', tgl='{tgl}', judul='{judul}', isi='{isi}', edited='1' WHERE kode='{kode}'"
+        cursor.execute(sql)
+        conn.commit()
+        closeDb()
+        return redirect(url_for('admin_messages'))
+    return render_template('admin_edit_pesan.html', pesan=pesan)
+
 
 @application.route('/admin/messages/hapus/<kode>')
 def admin_hapus_pesan(kode):
@@ -464,21 +484,12 @@ def tambah():
 #fungsi view edit() untuk form edit data
 @application.route('/admin/edit/<nik>/', methods=['GET','POST'])
 def edit(nik):
-    #Jika belum login sebagai admin tidak ke edit, harus login dulu
-    try: nia = session['nia']
-    except KeyError: return redirect(url_for('admin'))
-    
-    try:
-        #Jika sudah login sebagai user, tidak bisa ke edit, harus logout dulu
-        nik = session['nik']
-    except:
-        pass
-    else:
+    if 'nik' in session:
         return redirect(url_for('user'))
-    
-    try: forgot = session['forgot']
-    except: pass
-    else: return redirect(url_for('forgot_entry'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
+    if 'nia' not in session:
+        return redirect(url_for('admin_login'))
 
     openDb()
     cursor.execute('SELECT * FROM pegawai WHERE nik=%s', (nik))
@@ -528,6 +539,12 @@ def edit(nik):
 #fungsi menghapus data
 @application.route('/admin/hapus/<nik>', methods=['GET','POST'])
 def hapus(nik):
+    if 'nik' in session:
+        return redirect(url_for('user'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
+    if 'nia' not in session:
+        return redirect(url_for('admin_login'))
     openDb()
     cursor.execute('DELETE FROM pegawai WHERE nik=%s', (nik,))
     # Hapus foto berdasarkan NIK

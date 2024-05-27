@@ -31,9 +31,9 @@
   <div class="main">
     <div class="container">
         <form action="#" method="POST" enctype="multipart/form-data">
-            <input type="text" name="judul" id="judul" placeholder="Judul" autofocus required>
+            <input type="text" name="judul" id="judul" value="{{ pesan[3] }}" required>
             <br>
-            <textarea name="isi" id="isi" cols="80" rows="15" placeholder="Isi pesan" required></textarea>
+            <textarea name="isi" id="isi" cols="80" rows="15"required>{{ pesan[4] }}</textarea>
             <p>Max: 4000 characters</p>
             <div class="submit-box">
                 <input type="submit" class="btn btn-primary" value="Simpan">
