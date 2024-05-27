@@ -37,10 +37,6 @@ def closeDb():
     cursor.close()
     conn.close()
 
-@application.route('/general')
-def general():
-    return render_template('general.html')
-
 @application.route('/', methods=['GET','POST'])
 def home():
     try:
@@ -146,7 +142,6 @@ def user_contact():
 def user_logout():
     session.pop('nik', None)
     return redirect(url_for('home'))
-
 
 @application.route('/forgot', methods=['GET','POST'])
 def forgot():
@@ -434,6 +429,9 @@ def tambah():
             return render_template('tambah.html', form_data=request.form, nik=generated_nik,error='Passwords do not match!')
 
         hashed_password = generate_password_hash(password) #Hash the password
+        
+        # hashed_password = request.args.get('hashed_password')
+        session['hashed_password'] = hashed_password
 
         nama = request.form['nama']
         email = request.form['email']
@@ -487,8 +485,17 @@ def edit(nik):
     cursor.execute('SELECT * FROM pegawai WHERE nik=%s', (nik))
     data = cursor.fetchone()
     if request.method == 'POST':
-        nik = request.form['nik']
+        password = request.form['password']
+
+        confirm_pwd = request.form['confirm_password']
+
+        if password != confirm_pwd:
+            return render_template('edit.html', data=data, error='Passwords do not match!')
+
+        hashed_password = generate_password_hash(password) #Hash the password
+
         nama = request.form['nama']
+        email = request.form['email']
         alamat = request.form['alamat']
         tgllahir = request.form['tgllahir']
         jeniskelamin = request.form['jeniskelamin']
@@ -508,10 +515,10 @@ def edit(nik):
             foto_filename = f"{nik}.jpg"
         else:
             # Keep the old photo filename
-            foto_filename = data[-1]  # Assuming the last item in data is the photo filename
+            foto_filename = data[0] if data[0] else None  # Assuming the last item in data is the photo filename
 
-        sql = "UPDATE pegawai SET nama=%s, alamat=%s, tgllahir=%s, jeniskelamin=%s, status=%s, gaji=%s, foto=%s WHERE nik=%s"
-        val = (nama, alamat, tgllahir,jeniskelamin, status, gaji, foto_filename, nik)
+        sql = "UPDATE pegawai SET nama=%s, password=%s, alamat=%s, tgllahir=%s, jeniskelamin=%s, status=%s, gaji=%s, email=%s, foto=%s WHERE nik=%s"
+        val = (nama, hashed_password, alamat, tgllahir, jeniskelamin, status, gaji, email, foto_filename, nik)
         cursor.execute(sql, val)
         conn.commit()
         closeDb()
