@@ -463,20 +463,6 @@ def tambah():
     
 #fungsi view edit() untuk form edit data
 @application.route('/admin/edit/<nik>/', methods=['GET','POST'])
-def hapus(nik):
-    openDb()
-    cursor.execute('DELETE FROM pegawai WHERE nik=%s', (nik,))
-    # Hapus foto berdasarkan NIK
-    path_to_photo = os.path.join(application.root_path, UPLOAD_FOLDER, f'{nik}.jpg')
-    if os.path.exists(path_to_photo):
-        os.remove(path_to_photo)
-
-    conn.commit()
-    closeDb()
-    return redirect(url_for('admin_dashboard'))
-    
-#fungsi view edit() untuk form edit data
-@application.route('/edit/<nik>', methods=['GET','POST'])
 def edit(nik):
     #Jika belum login sebagai admin tidak ke edit, harus login dulu
     try: nia = session['nia']
