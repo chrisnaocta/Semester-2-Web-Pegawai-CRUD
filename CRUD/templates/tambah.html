@@ -18,6 +18,10 @@
   <!-- Theme style -->
   <!-- <link rel="stylesheet" href="../../dist/css/adminlte.min.css"> -->
   <link rel="stylesheet" href="{{ url_for('static', filename='adminlte/dist/css/adminlte.min_3.css') }}">
+
+  <!-- Library untuk show password -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
   <title>Document</title>
 </head>
 <body>
@@ -62,7 +66,7 @@
                 <!-- <label>Textarea Disabled</label> -->
                 <label for="ALAMAT">Alamat:</label>
                 <!-- <input type="text" name="alamat" class="form-control" value="{{ form_data.alamat if form_data else '' }}" rows="4" cols="50" maxlength="30" placeholder="Alamat pegawai" required> -->
-                <textarea class="form-control" rows="4" type="text" name="alamat" class="form-control" value="{{ form_data.alamat if form_data else '' }}" rows="4" cols="50" maxlength="200" placeholder="Alamat pegawai" required></textarea>
+                <textarea class="form-control" rows="4" type="text" name="alamat" class="form-control" rows="4" cols="50" maxlength="200" placeholder="Alamat pegawai" required>{{ form_data.alamat if form_data else '' }}</textarea>
               </div>
             </div>
             
@@ -169,14 +173,17 @@
 
               <div class="form-group">
                 {% if error %}
-                  <p style="color: red; font-weight: bold;">{{error}}</p>
+                  <p style="color: red; font-weight: bold; margin-top: -10px; margin-left: -1px; margin-bottom: -5px;">{{error}}</p>
                 {% endif %}
                   <label for="password">Password:</label>
                   <input type="password" class="form-control" id="password" name="password" autocomplete="current-password" minlength="8" required>
+                  <span class="password-toggle-icon"><i class="fas fa-eye" id="togglePassword"></i></span>
                   <br>
                   <label for="password">Confirm Password:</label>
                   <input type="password" class="form-control" id="confirm_password" name="confirm_password" autocomplete="new-password" minlength="8" required>
-              </div>
+                  <span class="password-toggle-icon"><i class="fas fa-eye" id="toggleConfirmPassword"></i></span>
+                  <br>
+                </div>
 
             </div>
 
@@ -184,7 +191,7 @@
               <div class="form-group">
                 <label for="FOTO">Foto:</label>
                 <br>    
-                <input style="margin-bottom: 10px ;" type="file" name="foto" accept="image/*" onchange="previewImage(event)">
+                <input style="margin-bottom: 10px ;" type="file" name="foto" accept="image/*" onchange="previewImage(event)" required>
                 <br>
                 <img id="preview" src="#" alt="Preview" style="max-width: 200px; max-height: 200px;">
               </div>
@@ -217,5 +224,37 @@
                     img.src = URL.createObjectURL(file);
                 }
             }
+
+            document.addEventListener("DOMContentLoaded", function() {
+            const passwordField = document.getElementById("password");
+            const confirmPasswordField = document.getElementById("confirm_password");
+            const togglePassword = document.getElementById("togglePassword");
+            const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
+
+            togglePassword.addEventListener("click", function () {
+              if (passwordField.type === "password") {
+                passwordField.type = "text";
+                togglePassword.classList.remove("fa-eye");
+                togglePassword.classList.add("fa-eye-slash");
+              } else {
+                passwordField.type = "password";
+                togglePassword.classList.remove("fa-eye-slash");
+                togglePassword.classList.add("fa-eye");
+              }
+            });
+
+            toggleConfirmPassword.addEventListener("click", function () {
+              if (confirmPasswordField.type === "password") {
+                confirmPasswordField.type = "text";
+                toggleConfirmPassword.classList.remove("fa-eye");
+                toggleConfirmPassword.classList.add("fa-eye-slash");
+              } else {
+                confirmPasswordField.type = "password";
+                toggleConfirmPassword.classList.remove("fa-eye-slash");
+                toggleConfirmPassword.classList.add("fa-eye");
+              }
+            });
+          });
+            
         </script>
 </html>

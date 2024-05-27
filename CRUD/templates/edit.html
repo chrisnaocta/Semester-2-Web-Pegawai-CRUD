@@ -4,83 +4,218 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css2/edit.css') }}">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <!-- <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='adminlte/plugins/fontawesome-free/css/all.min.css') }}">
+    <!-- Theme style -->
+    <!-- <link rel="stylesheet" href="../../dist/css/adminlte.min.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='adminlte/dist/css/adminlte.min_4.css') }}">
+
+    <!-- Library untuk show password -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <title>Edit Data</title>
 </head>
 <body>
-    <h1>Edit Data</h1>
     <div class="container">
-        <div class="box" id="box-1">
-        <form action="{{ url_for('edit', nik=data[0]) }}" method="post" enctype="multipart/form-data">
-        
-                    <label for="NIK">NIK:</label>
-                <br>
-                    <input type="text" name="nik" value="{{data[0]}}" value="{{nik}}" disabled>
-                <br>
-                
-                    <label for="NAMA">Nama:</label>
-                <br>
-                    <input type="text" name="nama" value="{{data[1]}}">
-                <br>
 
-                
+        <!-- general form elements disabled -->
+        <div class="card card-warning">
+          <div class="card-header">
+            <h3 class="card-title text-center">Edit Data</h3>
+          </div>
+          <!-- /.card-header -->
+          <div class="card-body">
+            <form action="{{ url_for('edit', nik=data[0]) }}" method="post" enctype="multipart/form-data">
+              <div class="row">
+                <div class="col-sm-6">
+                  <!-- text input -->
+                  <div class="form-group">
+                    <label for="NIK">NIK:</label>
+                        <!-- <input type="text" class="form-control" name="nik" placeholder="NIK" value="{{data[0]}}" value="{{nik}}" hidden> -->
+                        <input type="text" class="form-control" name="nik" value="{{data[0]}}" value="{{nik}}" disabled>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Nama</label>
+                    <label for="NAMA">Nama:</label>
+                    <!-- <input type="text" class="form-control" name="nama" value="{{ form_data.nama if form_data else '' }}" size="20" maxlength="50" placeholder="Nama pegawai" required> -->
+                    <input type="text" class="form-control" name="nama" value="{{data[1]}}" required>  
+                </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <!-- textarea -->
+                  <div class="form-group">
+                    <!-- <label>Email</label> -->
+                    <label for="EMAIL">Email:</label>
+                    <!-- <input type="text" name="email" class="form-control" value="{{ form_data.email if form_data else '' }}" size="20" maxlength="50" placeholder="Email pegawai" required> -->
+                    <input type="email" class="form-control" name="email" value="{{data[9]}}" required>  
+                </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <!-- <label>Textarea Disabled</label> -->
                     <label for="ALAMAT">Alamat:</label>
-                <br>
-                    <input type="text" name="alamat" value="{{data[2]}}">
-                <br>
-        </div>
-        <div class="box" id="box-2">
-                    <label for="TANGGAL">Tanggal lahir:</label>
-                <br>
-                    <input type="date" name="tgllahir" value="{{data[3]}}"><br>
-                    
-            <div clas="gender-box">
-            <label for="GENDER">Jenis kelamin:</label>
-                <div class="gender-option">
-                    <div class="gender">
-                        <input type="radio" name="jeniskelamin" value="Pria" {% if data[4] == "Pria" %}checked{% endif %}>
-                        <label for="check-male">Pria</label>
-                    </div>
-                    <div class="gender">
-                        <input type="radio" name="jeniskelamin" value="Wanita" {% if data[4] == "Wanita" %}checked{% endif %}>
-                        <label for="check-female">Wanita</label>
-                    </div>
+                    <!-- <input type="text" name="alamat" class="form-control" value="{{ form_data.alamat if form_data else '' }}" rows="4" cols="50" maxlength="30" placeholder="Alamat pegawai" required> -->
+                    <textarea class="form-control" rows="4" type="text" name="alamat" class="form-control" rows="4" cols="50" maxlength="200" placeholder="Alamat pegawai" required>{{data[2]}}</textarea>
+                  </div>
                 </div>
-            </div>
-                <br>        
-            <div class="status-box">
-                <label for="STATUS">Status menikah:</label>
-                <div class="status-option">
-                    <div class="status">
-                            <input type="radio" name="status" value="Sudah Menikah" {% if data[5] == "Sudah Menikah" %}checked{% endif %}> Sudah
-                    </div>
-                    <div class="status">
-                            <input type="radio" name="status" value="Belum Menikah" {% if data[5] == "Belum Menikah" %}checked{% endif %}> Belum
-                    </div>
-                    <div class="status">
-                        <input type="radio" name="status" value="Pisah" {% if data[5] == "Pisah" %}checked{% endif %}> Pisah
-                    </div>
+                
+                <div class="col-sm-6" style="margin-top: -83px;">
+                  <!-- textarea -->
+                  <div class="form-group">
+                    <!-- <label>Email</label> -->
+                    <label for="TANGGAL" style="margin-bottom: 5px;">Tanggal lahir:</label>
+                    <!-- <input type="date" name="tgllahir" class="form-control" value="{{ form_data.tgllahir if form_data else '' }}" required> -->
+                    <input type="date" class="form-control" name="tgllahir" value="{{data[3]}}" required>    
                 </div>
-            </div>
-            <div class="gaji-box">
-                <label for="GAJI">Gaji:</label>
-                    <div class="gaji-input">
-                        <input type="number" name="gaji" value="{{data[6]}}">
+                </div>
+    
+              </div>
+      
+              <!-- input states -->
+              <!-- <div class="form-group">
+                <label class="col-form-label" for="inputSuccess"><i class="fas fa-check"></i> Input with
+                  success</label>
+                <input type="text" class="form-control is-valid" id="inputSuccess" placeholder="Enter ...">
+              </div>
+              <div class="form-group">
+                <label class="col-form-label" for="inputWarning"><i class="far fa-bell"></i> Input with
+                  warning</label>
+                <input type="text" class="form-control is-warning" id="inputWarning" placeholder="Enter ...">
+              </div>
+              <div class="form-group">
+                <label class="col-form-label" for="inputError"><i class="far fa-times-circle"></i> Input with
+                  error</label>
+                <input type="text" class="form-control is-invalid" id="inputError" placeholder="Enter ...">
+              </div> -->
+      
+              <!-- <div class="row">
+                  radio
+                  <div class="form-group">
+                    <label style="margin-left: 8px;">Jenis kelamin</label>
+                    <div class="form-check">
+                      <div class="custom-control custom-radio">
+                        <input class="form-check-input" type="radio" id="check-male" name="jeniskelamin" class="custom-control-input" value="Pria" {{ 'checked' if form_data and form_data.jeniskelamin == 'Pria' else '' }} required>
+                        <label class="form-check-label" for="check-male">Pria</label>
+                      </div>
+    
                     </div>
-            </div>
-        </div>
-    </div>
+                    <div class="form-check">
+                      <div class="custom-control custom-radio">
+                        <input class="form-check-input" type="radio" id="check-female" class="custom-control-input" name="jeniskelamin" value="Wanita"  {{ 'checked' if form_data and form_data.jeniskelamin == 'Wanita' else '' }} required>
+                        <label class="form-check-label"  for="check-female">Wanita</label>
+                      </div>
+    
+                    </div>
+                  </div>
+    
+                  <div class="form-group" style="margin-left: 50px;">
+                    <label style="margin-left: 8px;">Status menikah</label>
+                    <div class="form-check">
+                      <div class="custom-control custom-radio">
+                        <input type="radio" class="form-check-input" id="sudah" name="status" value="Sudah Menikah" {{ 'checked' if form_data and form_data.status == 'Sudah Menikah' else '' }} required>
+                        <label class="form-check-label"  for="sudah">Sudah</label>
+                      </div>
+    
+                    </div>
+                    <div class="form-check">
+    
+                      <div class="custom-control custom-radio">
+    
+                        <input type="radio" class="form-check-input" id="belum" name="status" value="Belum Menikah" {{ 'checked' if form_data and form_data.status == 'Belum Menikah' else '' }} required>
+                        <label class="form-check-label"  for="belum">Belum</label>
+                      </div>
+    
+                    </div>
+                  </div>
+    
+                </div> -->
+      
+              <div class="row">
+                <div class="col-sm-6">
+                  <!-- select -->
+                  <div class="form-group">
+                    <label>Jenis kelamin</label>
+                    <select class="form-control" name="jeniskelamin">
+                      <option value="Pria" {{ 'selected' if data[4] == 'Pria' else '' }}>Pria</option>
+                      <option value="Wanita" {{ 'selected' if data[4] == 'Wanita' else '' }}>Wanita</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label>Status menikah</label>
+                    <select class="form-control" name="status">
+                      <option value="Sudah Menikah" {{ 'selected' if data[5] == 'Sudah Menikah' else '' }}>Sudah Menikah</option>
+                      <option value="Belum Menikah" {{ 'selected' if data[5] == 'Belum Menikah' else '' }}>Belum Menikah</option>
+                      <option value="Pisah" {{ 'selected' if data[5] == 'Pisah' else '' }}>Pisah</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+      
+              <div class="row">
+                <div class="col-sm-6">
+                  <!-- textarea -->
+                  <div class="form-group">
+                    <label for="GAJI">Gaji:</label>
+                    <!-- <input type="number" name="gaji" class="form-control" value="{{ form_data.gaji if form_data else '' }}" size="20" maxlength="50" placeholder="Email pegawai" required> -->
+                    <input type="number" class="form-control" name="gaji" value="{{data[6]}}" required>   
+                </div>
+    
+                <div class="form-group">
+                    {% if error %}
+                        <p style="color: red; font-weight: bold; margin-top: -10px; margin-left: -1px; margin-bottom: -5px;">{{error}}</p>
+                    {% endif %}
+                      <label for="password">Password:</label>
+                      <!-- <input type="password" class="form-control" id="password" name="password" autocomplete="current-password" minlength="8" required> -->
+                      <input type="password" class="form-control" id="password" name="password" autocomplete="current-password" value="{{data[8]}}" minlength="8" required>
+                      <span class="password-toggle-icon"><i class="fas fa-eye" id="togglePassword"></i></span>
+                      <br>
+                      <label for="password">Confirm Password:</label>
+                      <!-- <input type="password" class="form-control" id="confirm_password" name="confirm_password" autocomplete="new-password" minlength="8" required> -->
+                      <input type="confirm_password" class="form-control" id="confirm_password" name="confirm_password" autocomplete="new-password" value="{{data[8]}}" minlength="8" required>
+                      <span class="password-toggle-icon"><i class="fas fa-eye" id="toggleConfirmPassword"></i></span>
+                      <br>
+                  </div>
+    
+                </div>
+    
+                <div class="col-sm-6">
+                  <div class="form-group">
                     <label for="FOTO">Foto:</label>
-                <br>    
-                    <input type="file" name="foto" accept="image/*" onchange="previewImage(event)">
+                    <br>    
+                    <input style="margin-bottom: 10px ;" type="file" name="foto" accept="image/*" onchange="previewImage(event)">
                     <input type="hidden" name="nik" value="{{ data[0] }}">
-                <br>
-                    <img id="preview" src="#" alt="Preview" style="max-width: 200px; max-height: 200px;">
-        
-                <div class="submit-box">
-                    <input type="submit" value="Simpan" onclick="return confirmAndSubmit()">
-                    <input type="button" value="Batal" onclick="cancel()">
+                    <br>
+                    <img id="preview" src="{{ url_for('static', filename='images/' + data[0] + '.jpg') }}" alt="Preview" style="max-width: 200px; max-height: 200px;">
+                  </div>
                 </div>
-        </form>
+              </div>
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer text-center">
+              <input type="submit" class="btn btn-primary" value="Simpan">
+              <input type="button" class="btn btn-secondary" value="Batal" onclick="cancel()">
+            </div>
+          </form>
+        </div>
+        <!-- /.card -->
+        <!-- general form elements disabled -->
+    
+      </div>
         
 </body>
 <script>
@@ -107,5 +242,36 @@
         const img = document.getElementById('preview');
         img.src = URL.createObjectURL(event.target.files[0]);
     }
+
+    document.addEventListener("DOMContentLoaded", function() {
+    const passwordField = document.getElementById("password");
+    const confirmPasswordField = document.getElementById("confirm_password");
+    const togglePassword = document.getElementById("togglePassword");
+    const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
+
+    togglePassword.addEventListener("click", function () {
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            togglePassword.classList.remove("fa-eye");
+            togglePassword.classList.add("fa-eye-slash");
+        } else {
+            passwordField.type = "password";
+            togglePassword.classList.remove("fa-eye-slash");
+            togglePassword.classList.add("fa-eye");
+        }
+    });
+
+    toggleConfirmPassword.addEventListener("click", function () {
+        if (confirmPasswordField.type === "password") {
+            confirmPasswordField.type = "text";
+            toggleConfirmPassword.classList.remove("fa-eye");
+            toggleConfirmPassword.classList.add("fa-eye-slash");
+        } else {
+            confirmPasswordField.type = "password";
+            toggleConfirmPassword.classList.remove("fa-eye-slash");
+            toggleConfirmPassword.classList.add("fa-eye");
+        }
+    });
+});
 </script>
 </html>

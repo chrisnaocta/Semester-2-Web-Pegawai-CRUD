@@ -21,8 +21,7 @@ db = SQLAlchemy(application)
 mysql = MySQL(application)
 
 #fungsi untuk menyimpan lokasi foto
-# UPLOAD_FOLDER = 'E:\FILE OCTA\KULIAH\SEMESTER 2\WEB OOP\Web_Pegawai\CRUD\static\images'
-UPLOAD_FOLDER = '/static/images'
+UPLOAD_FOLDER = 'E:\FILE OCTA\KULIAH\SEMESTER 2\WEB OOP\Web_Pegawai\CRUD\static\images'
 application.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 #fungsi koneksi ke basis data
@@ -477,6 +476,98 @@ def hapus(nik):
     closeDb()
     return redirect(url_for('admin_dashboard'))
 
+
+#fungsi view tambah() untuk membuat form tambah data
+@application.route('/tambah', methods=['GET','POST'])
+def tambah():
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
+    if 'nik' in session:
+        return redirect(url_for('user'))
+    if 'nia' not in session:
+        return redirect(url_for('admin_login'))
+
+    generated_nik = generate_nik()  # Memanggil fungsi untuk mendapatkan NIK otomatis
+    
+    if request.method == 'POST':
+        nik = request.form['nik']
+        password = request.form['password']
+
+        confirm_pwd = request.form['confirm_password']
+
+        if password != confirm_pwd:
+            return render_template('tambah.html', form_data=request.form, nik=generated_nik,error='Passwords do not match!')
+
+        hashed_password = generate_password_hash(password) #Hash the password
+        
+        # hashed_password = request.args.get('hashed_password')
+        session['hashed_password'] = hashed_password
+
+        nama = request.form['nama']
+        email = request.form['email']
+        alamat = request.form['alamat']
+        tgllahir = request.form['tgllahir']
+        jeniskelamin = request.form['jeniskelamin']
+        status = request.form['status']
+        gaji = request.form['gaji']
+        foto = request.form['nik']
+
+        # Pastikan direktori upload ada
+        if not os.path.exists(UPLOAD_FOLDER):
+            os.makedirs(UPLOAD_FOLDER)
+
+        # Simpan foto dengan nama NIK
+        if 'foto' in request.files:
+            foto = request.files['foto']
+            if foto.filename != '':
+                foto.save(os.path.join(application.config['UPLOAD_FOLDER'], f"{nik}.jpg"))
+
+        openDb()
+        sql = "INSERT INTO pegawai (nik,password,email,nama,alamat,tgllahir,jeniskelamin,status,gaji,foto) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        val = (nik,hashed_password,email,nama,alamat,tgllahir,jeniskelamin,status,gaji,nik)
+        cursor.execute(sql, val)
+        conn.commit()
+        closeDb()
+        return redirect(url_for('admin_dashboard'))        
+    else:
+        return render_template('tambah.html', nik=generated_nik)  # Mengirimkan NIK otomatis ke template
+    
+#fungsi view edit() untuk form edit data
+@application.route('/edit/<nik>', methods=['GET','POST'])
+def edit(nik):
+    #Jika belum login sebagai admin tidak ke edit, harus login dulu
+    try: nia = session['nia']
+    except KeyError: return redirect(url_for('admin'))
+    
+    try:
+        #Jika sudah login sebagai user, tidak bisa ke edit, harus logout dulu
+        nik = session['nik']
+    except:
+        pass
+    else:
+        return redirect(url_for('user'))
+    
+    try: forgot = session['forgot']
+    except: pass
+    else: return redirect(url_for('forgot_entry'))
+
+
+# membuat kode pesan otomatis
+def generate_pesan():
+    openDb()
+    LENGTH = 8
+
+    while True:
+        characters = string.ascii_letters + string.digits
+        generated_string = ''.join(random.choices(characters, k=LENGTH))
+        cursor.execute(f"SELECT kode FROM pesan WHERE kode = '{generated_string}'")
+        temp = cursor.fetchone()
+        if not temp:
+            break
+    closeDb()
+    return generated_string
+
+
 #fungsi cetak ke PDF
 @application.route('/print/<nik>', methods=['GET'])
 def get_employee_data(nik):
@@ -597,23 +688,6 @@ def generate_nik():
     closeDb()  # untuk menutup koneksi database 
     
     return next_nik
-
-# membuat kode pesan otomatis
-def generate_pesan():
-
-    openDb()
-    LENGTH = 8
-
-    while True:
-        characters = string.ascii_letters + string.digits
-        generated_string = ''.join(random.choices(characters, k=LENGTH))
-        cursor.execute(f"SELECT kode FROM pesan WHERE kode = '{generated_string}'")
-        temp = cursor.fetchone()
-        if not temp:
-            break
-    closeDb()
-    return generated_string
-
 
 #Program utama     
 def main():
