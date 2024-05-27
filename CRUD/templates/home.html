@@ -43,7 +43,9 @@
                 <div class="form-group row">
                   <label for="inputPassword3" class="col-sm-2 col-form-label">Password</label>
                   <div class="col-sm-10">
-                    <input type="password" class="form-control" id="inputPassword3" placeholder="Password" name="password" required>
+                    <!-- <input type="password" class="form-control" id="inputPassword3" placeholder="Password" name="password" required> -->
+                    <input type="password" class="form-control password-input1" id="password" name="password"  placeholder="Password" autocomplete="current-password" minlength="8" required>
+                    <span class="password-toggle-icon"><i class="fas fa-eye" id="togglePassword"></i></span>
                   </div>
                 </div>
     
@@ -72,4 +74,26 @@
     </div>
 
 </body>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const passwordField = document.getElementById("password");
+    const confirmPasswordField = document.getElementById("confirm_password");
+    const togglePassword = document.getElementById("togglePassword");
+    const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
+
+    togglePassword.addEventListener("click", function () {
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            togglePassword.classList.remove("fa-eye");
+            togglePassword.classList.add("fa-eye-slash");
+        } else {
+            passwordField.type = "password";
+            togglePassword.classList.remove("fa-eye-slash");
+            togglePassword.classList.add("fa-eye");
+        }
+    });
+});
+</script>
+
 </html>

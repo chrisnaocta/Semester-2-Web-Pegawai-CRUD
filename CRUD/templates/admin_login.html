@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css2/home.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css2/admin_login.css') }}">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.slim.min.js"></script>
@@ -18,6 +18,9 @@
     <!-- Theme style -->
     <!-- <link rel="stylesheet" href="../../dist/css/adminlte.min.css"> -->
     <link rel="stylesheet" href="{{ url_for('static', filename='adminlte/dist/css/adminlte.min_2.css') }}">
+
+    <!-- Library untuk show password -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>Login Page</title>
 </head>
 <body>
@@ -29,7 +32,7 @@
             </div>
             <!-- /.card-header -->
             {% if error %}
-                <p style="color: red; text-align: center; font-weight: bold;">{{error}}</p>
+                <p style="  color: red; text-align: center; font-weight: bold;">{{error}}</p>
             {% endif %}
             <!-- form start -->
             <form class="form-horizontal" method="POST" action="/admin/login">
@@ -43,7 +46,9 @@
                 <div class="form-group row">
                   <label for="inputPassword3" class="col-sm-2 col-form-label">Password</label>
                   <div class="col-sm-10">
-                    <input type="password" class="form-control" id="inputPassword3" placeholder="Password" name="password" required>
+                    <!-- <input type="password" class="form-control" id="inputPassword3" placeholder="Password" name="password" required> -->
+                    <input type="password" class="form-control password-input1" id="password" name="password"  placeholder="Password" autocomplete="current-password" minlength="8" required>
+                    <span class="password-toggle-icon"><i class="fas fa-eye" id="togglePassword"></i></span>
                   </div>
                 </div>
     
@@ -75,4 +80,26 @@
     </div>
 
 </body>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const passwordField = document.getElementById("password");
+    const confirmPasswordField = document.getElementById("confirm_password");
+    const togglePassword = document.getElementById("togglePassword");
+    const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
+
+    togglePassword.addEventListener("click", function () {
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            togglePassword.classList.remove("fa-eye");
+            togglePassword.classList.add("fa-eye-slash");
+        } else {
+            passwordField.type = "password";
+            togglePassword.classList.remove("fa-eye-slash");
+            togglePassword.classList.add("fa-eye");
+        }
+    });
+});
+</script>
+
 </html>

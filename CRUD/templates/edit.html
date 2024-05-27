@@ -260,18 +260,6 @@
             togglePassword.classList.add("fa-eye");
         }
     });
-
-    toggleConfirmPassword.addEventListener("click", function () {
-        if (confirmPasswordField.type === "password") {
-            confirmPasswordField.type = "text";
-            toggleConfirmPassword.classList.remove("fa-eye");
-            toggleConfirmPassword.classList.add("fa-eye-slash");
-        } else {
-            confirmPasswordField.type = "password";
-            toggleConfirmPassword.classList.remove("fa-eye-slash");
-            toggleConfirmPassword.classList.add("fa-eye");
-        }
-    });
 });
 </script>
 </html>

@@ -26,7 +26,6 @@
     <a {% if dashboard %}class="checked"{% endif %} href="/admin/dashboard">Home</a>
     <a {% if profile %}class="checked"{% endif %} href="/admin/profile">Profile</a>
     <a {% if messages %}class="checked"{% endif %} href="/admin/messages">Messages</a>
-    <a {% if contact %}class="checked"{% endif %} href="/admin/contact">Contact</a>
     <a href="/admin/logout">Log Out</a>
   </div>
   <div class="main">
@@ -71,5 +70,82 @@
         <a class="right btn btn-primary" href="/admin/tambah_pesan">Tambah Pesan Baru</a>
     </div>
   </div>
+
+  <!-- JavaScript untuk Bootstrap -->
+  <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+    
+  <script>
+      var currentPage = 1;
+      var itemsPerPage = 4;
+      var totalRows = document.querySelectorAll('tbody tr').length;
+
+      function displayData(page) {
+          var startIndex = (page - 1) * itemsPerPage;
+          var endIndex = startIndex + itemsPerPage;
+
+          var rows = document.querySelectorAll('tbody tr');
+          for (var i = 0; i < rows.length; i++) {
+              if (i >= startIndex && i < endIndex) {
+                  rows[i].style.display = "";
+              } else {
+                  rows[i].style.display = "none";
+              }
+          }
+      }
+
+      function updatePaginationButtons() {
+          var totalPages = Math.ceil(totalRows / itemsPerPage);
+          var page1 = document.getElementById('page1');
+          var page2 = document.getElementById('page2');
+          var page3 = document.getElementById('page3');
+
+          if (currentPage <= 3) {
+              page1.innerHTML = '<button class="page-link btn btn-link">1</button>';
+              page2.innerHTML = '<button class="page-link btn btn-link">2</button>';
+              page3.innerHTML = '<button class="page-link btn btn-link">3</button>';
+          } else {
+              page1.innerHTML = '<button class="page-link btn btn-link">' + (currentPage - 1) + '</button>';
+              page2.innerHTML = '<button class="page-link btn btn-link">' + currentPage + '</button>';
+              page3.innerHTML = '<button class="page-link btn btn-link">' + (currentPage + 1) + '</button>';
+          }
+      }
+
+      displayData(currentPage);
+      updatePaginationButtons();
+
+      document.getElementById('previous').addEventListener('click', function() {
+          if (currentPage > 1) {
+              currentPage--;
+              displayData(currentPage);
+              updatePaginationButtons();
+          }
+      });
+
+      document.getElementById('next').addEventListener('click', function() {
+          if (currentPage < Math.ceil(totalRows / itemsPerPage)) {
+              currentPage++;
+              displayData(currentPage);
+              updatePaginationButtons();
+          }
+      });
+
+      document.getElementById('page1').addEventListener('click', function() {
+          currentPage = parseInt(this.textContent);
+          displayData(currentPage);
+          updatePaginationButtons();
+      });
+
+      document.getElementById('page2').addEventListener('click', function() {
+          currentPage = parseInt(this.textContent);
+          displayData(currentPage);
+          updatePaginationButtons();
+      });
+
+      document.getElementById('page3').addEventListener('click', function() {
+          currentPage = parseInt(this.textContent);
+          displayData(currentPage);
+          updatePaginationButtons();
+      });
+  </script>
 </body>
 </html>
