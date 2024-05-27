@@ -36,7 +36,7 @@ def closeDb():
     cursor.close()
     conn.close()
 
-@application.route('/general')
+@application.route('/general/')
 def general():
     return render_template('general.html')
 
@@ -119,7 +119,7 @@ def user_messages():
     
     openDb()
     container = []
-    cursor.execute(f"SELECT * FROM pesan")
+    cursor.execute(f"SELECT * FROM pesan ORDER BY tgl DESC")
     result = cursor.fetchall()
     for message in result:
         container.append(message)
@@ -161,7 +161,7 @@ def user_logout():
     return redirect(url_for('home'))
 
 
-@application.route('/forgot', methods=['GET','POST'])
+@application.route('/forgot/', methods=['GET','POST'])
 def forgot():
     if 'nik' in session:
         return redirect(url_for('user'))
@@ -318,6 +318,7 @@ def admin_register():
     
     return render_template('admin_register.html', nia=generated_nia)
 
+
 @application.route('/admin/messages/')
 def admin_messages():
     if 'nik' in session:
@@ -326,7 +327,32 @@ def admin_messages():
         return redirect(url_for('forgot_entry'))
     if 'nia' not in session:
         return redirect(url_for('admin_login'))
-    return render_template('admin_messages.html')
+    
+    openDb()
+    container = []
+    cursor.execute(f"SELECT * FROM pesan ORDER BY tgl DESC")
+    result = cursor.fetchall()
+    for message in result:
+        container.append(message)
+    closeDb()
+    return render_template('admin_messages.html', container=container)
+
+@application.route('/admin/messages/<kode>/')
+def admin_message(kode):
+    if 'nik' in session:
+        return redirect(url_for('user_dashboard'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
+    if 'nia' not in session:
+        return redirect(url_for('admin_login'))
+    openDb()
+    cursor.execute(f"SELECT * FROM pesan WHERE kode = '{kode}'")
+    pesan = cursor.fetchone()
+    if not pesan:
+        return redirect(url_for('admin_messages'))
+    isi = pesan[4].split("\n")
+    closeDb()
+    return render_template('admin_message.html', pesan=pesan, isi=isi)
 
 @application.route('/admin/tambah_pesan/', methods=['GET', 'POST'])
 def admin_tambah_pesan():
@@ -348,9 +374,35 @@ def admin_tambah_pesan():
         judul = request.form['judul']
         isi = request.form['isi']
 
+        sql = f"INSERT INTO pesan (kode,author,tgl,judul,isi) VALUES ('{kode}', '{author}', '{tgl}', '{judul}', '{isi}')"
+        cursor.execute(sql)
+        conn.commit()
         closeDb()
+        return redirect(url_for('admin_messages'))
+    return render_template('admin_tambah_pesan.html')
 
-    return render_template('admin_pesan.html')
+@application.route('admin/messages/edit/<kode>')
+def admin_edit_pesan(kode):
+    if 'nik' in session:
+        return redirect(url_for('user'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
+    if 'nia' not in session:
+        return redirect(url_for('admin_login'))   
+
+@application.route('/admin/messages/hapus/<kode>')
+def admin_hapus_pesan(kode):
+    if 'nik' in session:
+        return redirect(url_for('user'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
+    if 'nia' not in session:
+        return redirect(url_for('admin_login'))
+    openDb()
+    cursor.execute(f"DELETE FROM pesan WHERE kode='{kode}'")
+    conn.commit()
+    closeDb()
+    return redirect(url_for('admin_messages'))
 
 @application.route('/admin/logout/')
 def admin_logout():
@@ -376,7 +428,7 @@ def tambah():
         confirm_pwd = request.form['confirm_password']
 
         if password != confirm_pwd:
-            return render_template('tambah.html', form_data=request.form, nik=generated_nik, error='Passwords do not match!')
+            return render_template('tambah_1.html', form_data=request.form, nik=generated_nik, error='Passwords do not match!')
 
         hashed_password = generate_password_hash(password) #Hash the password
 
@@ -411,6 +463,20 @@ def tambah():
     
 #fungsi view edit() untuk form edit data
 @application.route('/admin/edit/<nik>/', methods=['GET','POST'])
+def hapus(nik):
+    openDb()
+    cursor.execute('DELETE FROM pegawai WHERE nik=%s', (nik,))
+    # Hapus foto berdasarkan NIK
+    path_to_photo = os.path.join(application.root_path, UPLOAD_FOLDER, f'{nik}.jpg')
+    if os.path.exists(path_to_photo):
+        os.remove(path_to_photo)
+
+    conn.commit()
+    closeDb()
+    return redirect(url_for('admin_dashboard'))
+    
+#fungsi view edit() untuk form edit data
+@application.route('/edit/<nik>', methods=['GET','POST'])
 def edit(nik):
     #Jika belum login sebagai admin tidak ke edit, harus login dulu
     try: nia = session['nia']
@@ -607,6 +673,21 @@ def generate_nik():
     closeDb()  # untuk menutup koneksi database 
     
     return next_nik
+
+# membuat kode pesan otomatis
+def generate_pesan():
+    openDb()
+    LENGTH = 8
+
+    while True:
+        characters = string.ascii_letters + string.digits
+        generated_string = ''.join(random.choices(characters, k=LENGTH))
+        cursor.execute(f"SELECT kode FROM pesan WHERE kode = '{generated_string}'")
+        temp = cursor.fetchone()
+        if not temp:
+            break
+    closeDb()
+    return generated_string
 
 #Program utama     
 def main():
