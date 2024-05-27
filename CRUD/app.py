@@ -552,22 +552,6 @@ def edit(nik):
     else: return redirect(url_for('forgot_entry'))
 
 
-# membuat kode pesan otomatis
-def generate_pesan():
-    openDb()
-    LENGTH = 8
-
-    while True:
-        characters = string.ascii_letters + string.digits
-        generated_string = ''.join(random.choices(characters, k=LENGTH))
-        cursor.execute(f"SELECT kode FROM pesan WHERE kode = '{generated_string}'")
-        temp = cursor.fetchone()
-        if not temp:
-            break
-    closeDb()
-    return generated_string
-
-
 #fungsi cetak ke PDF
 @application.route('/print/<nik>', methods=['GET'])
 def get_employee_data(nik):
@@ -688,6 +672,22 @@ def generate_nik():
     closeDb()  # untuk menutup koneksi database 
     
     return next_nik
+
+
+# membuat kode pesan otomatis
+def generate_pesan():
+    openDb()
+    LENGTH = 8
+
+    while True:
+        characters = string.ascii_letters + string.digits
+        generated_string = ''.join(random.choices(characters, k=LENGTH))
+        cursor.execute(f"SELECT kode FROM pesan WHERE kode = '{generated_string}'")
+        temp = cursor.fetchone()
+        if not temp:
+            break
+    closeDb()
+    return generated_string
 
 #Program utama     
 def main():
