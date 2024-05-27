@@ -120,7 +120,7 @@ def user_messages():
     
     openDb()
     container = []
-    cursor.execute(f"SELECT * FROM pesan")
+    cursor.execute(f"SELECT * FROM pesan ORDER BY tgl DESC")
     result = cursor.fetchall()
     for message in result:
         container.append(message)
@@ -331,7 +331,7 @@ def admin_messages():
     
     openDb()
     container = []
-    cursor.execute(f"SELECT * FROM pesan")
+    cursor.execute(f"SELECT * FROM pesan ORDER BY tgl DESC")
     result = cursor.fetchall()
     for message in result:
         container.append(message)
@@ -375,9 +375,35 @@ def admin_tambah_pesan():
         judul = request.form['judul']
         isi = request.form['isi']
 
+        sql = f"INSERT INTO pesan (kode,author,tgl,judul,isi) VALUES ('{kode}', '{author}', '{tgl}', '{judul}', '{isi}')"
+        cursor.execute(sql)
+        conn.commit()
         closeDb()
+        return redirect(url_for('admin_messages'))
+    return render_template('admin_tambah_pesan.html')
 
-    return render_template('admin_pesan.html')
+@application.route('admin/messages/edit/<kode>')
+def admin_edit_pesan(kode):
+    if 'nik' in session:
+        return redirect(url_for('user'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
+    if 'nia' not in session:
+        return redirect(url_for('admin_login'))   
+
+@application.route('/admin/messages/hapus/<kode>')
+def admin_hapus_pesan(kode):
+    if 'nik' in session:
+        return redirect(url_for('user'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
+    if 'nia' not in session:
+        return redirect(url_for('admin_login'))
+    openDb()
+    cursor.execute(f"DELETE FROM pesan WHERE kode='{kode}'")
+    conn.commit()
+    closeDb()
+    return redirect(url_for('admin_messages'))
 
 @application.route('/admin/logout/')
 def admin_logout():
@@ -439,62 +465,6 @@ def tambah():
     
 #fungsi view edit() untuk form edit data
 @application.route('/admin/edit/<nik>/', methods=['GET','POST'])
-def edit(nik):
-    #Jika belum login sebagai admin tidak ke edit, harus login dulu
-    try: nia = session['nia']
-    except KeyError: return redirect(url_for('admin'))
-    
-    try:
-        #Jika sudah login sebagai user, tidak bisa ke edit, harus logout dulu
-        nik = session['nik']
-    except:
-        pass
-    else:
-        return redirect(url_for('user'))
-    
-    try: forgot = session['forgot']
-    except: pass
-    else: return redirect(url_for('forgot_entry'))
-
-    openDb()
-    cursor.execute('SELECT * FROM pegawai WHERE nik=%s', (nik))
-    data = cursor.fetchone()
-    if request.method == 'POST':
-        nik = request.form['nik']
-        nama = request.form['nama']
-        alamat = request.form['alamat']
-        tgllahir = request.form['tgllahir']
-        jeniskelamin = request.form['jeniskelamin']
-        status = request.form['status']
-        gaji = request.form['gaji']
-
-        # Check if a new file is uploaded
-        if 'foto' in request.files and request.files['foto'].filename != '':
-            # Remove the old photo if it exists
-            path_to_photo = os.path.join(application.root_path, UPLOAD_FOLDER, f'{nik}.jpg')
-            if os.path.exists(path_to_photo):
-                os.remove(path_to_photo)
-
-            # Save the new photo with the NIK name
-            foto = request.files['foto']
-            foto.save(os.path.join(application.config['UPLOAD_FOLDER'], f"{nik}.jpg"))
-            foto_filename = f"{nik}.jpg"
-        else:
-            # Keep the old photo filename
-            foto_filename = data[-1]  # Assuming the last item in data is the photo filename
-
-        sql = "UPDATE pegawai SET nama=%s, alamat=%s, tgllahir=%s, jeniskelamin=%s, status=%s, gaji=%s, foto=%s WHERE nik=%s"
-        val = (nama, alamat, tgllahir,jeniskelamin, status, gaji, foto_filename, nik)
-        cursor.execute(sql, val)
-        conn.commit()
-        closeDb()
-        return redirect(url_for('admin_dashboard'))
-    else:
-        closeDb()
-        return render_template('edit.html', data=data)
-
-#fungsi menghapus data
-@application.route('/admin/hapus/<nik>', methods=['GET','POST'])
 def hapus(nik):
     openDb()
     cursor.execute('DELETE FROM pegawai WHERE nik=%s', (nik,))
@@ -639,7 +609,7 @@ def generate_pesan():
         generated_string = ''.join(random.choices(characters, k=LENGTH))
         cursor.execute(f"SELECT kode FROM pesan WHERE kode = '{generated_string}'")
         temp = cursor.fetchone()
-        if not temp[0]:
+        if not temp:
             break
     closeDb()
     return generated_string
