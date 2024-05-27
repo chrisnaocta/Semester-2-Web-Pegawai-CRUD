@@ -20,10 +20,20 @@
     <div class="container">
       <h2>Message</h2>
       <h3>{{pesan[3]}}</h3>
-        <p>Posted on {{pesan[2]}} by {{pesan[1]}}</p> <br>
+      {% if pesan[5] == 0 %}
+        <p>Posted on {{pesan[2]}} by {{pesan[1]}}</p>
+      {% else %}
+        <p>Last edited on {{pesan[2]}} by {{pesan[1]}}</p>
+      {% endif %}
+      <br>
         {% for line in isi %}
         <p>{{line}}</p>
         {% endfor %}
+        <div>
+          <a href="/admin/messages" class="btn btn-secondary">Back</a>
+          <a href="/admin/messages/edit/{{pesan[0]}}" class="btn btn-warning" role="button">Edit</a>
+          <a href="/admin/messages/hapus/{{pesan[0]}}" class="btn btn-danger" role="button" onclick="return confirm('Apakah Anda yakin ingin menghapus pesan ini?')">Delete</a>
+        </div>
   </div>
   </div> 
 </body>
