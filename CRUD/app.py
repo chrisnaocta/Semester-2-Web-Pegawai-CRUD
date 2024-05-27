@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_mysqldb import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
 
-import pymysql.cursors, os, datetime
+import pymysql.cursors, os, datetime, random, string
 
 application = Flask(__name__)
 conn = cursor = None
@@ -22,7 +22,6 @@ mysql = MySQL(application)
 
 #fungsi untuk menyimpan lokasi foto
 UPLOAD_FOLDER = 'E:\FILE OCTA\KULIAH\SEMESTER 2\WEB OOP\Web_Pegawai\CRUD\static\images'
-# UPLOAD_FOLDER = '/static/images'
 application.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 #fungsi koneksi ke basis data
@@ -37,27 +36,18 @@ def closeDb():
     cursor.close()
     conn.close()
 
+@application.route('/general')
+def general():
+    return render_template('general.html')
+
 @application.route('/', methods=['GET','POST'])
 def home():
-    try:
-        #Jika sudah login sebagai user, tidak bisa login lagi, harus logout dulu
-        nik = session['nik']
-    except:
-        pass
-    else:
+    if 'nik' in session:
         return redirect(url_for('user'))
-    
-    try:
-        #Jika sudah login sebagai admin tidak bisa ke user, harus logout baru login
-        nia = session['nia']
-    except:
-        pass
-    else:
+    if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
-    
-    try: forgot = session['forgot']
-    except: pass
-    else: return redirect(url_for('forgot_entry'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
 
     if request.method == "POST":
         nik = request.form.get('nik')
@@ -77,20 +67,24 @@ def home():
     return render_template('home.html')
 
 # User Pages
-@application.route('/user')
+@application.route('/user/')
 def user():
-    if 'nik' not in session:
-        return redirect(url_for('home'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
+    if 'nik' not in session:
+        return redirect(url_for('home'))
     return redirect(url_for('user_dashboard'))
 
-@application.route('/user/dashboard')
+@application.route('/user/dashboard/')
 def user_dashboard():
-    if 'nik' not in session:
-        return redirect(url_for('home'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
+    if 'nik' not in session:
+        return redirect(url_for('home'))
     nik = session['nik']
     openDb()
     cursor.execute(f"SELECT * FROM pegawai WHERE nik = '{nik}'")
@@ -98,12 +92,14 @@ def user_dashboard():
     closeDb()
     return render_template('user_dashboard.html', data=data, welcome=True)
 
-@application.route('/user/profile')
+@application.route('/user/profile/')
 def user_profile():
-    if 'nik' not in session:
-        return redirect(url_for('home'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
+    if 'nik' not in session:
+        return redirect(url_for('home'))
     nik = session['nik']
     openDb()
     cursor.execute(f"SELECT * FROM pegawai WHERE nik = '{nik}'")
@@ -112,12 +108,14 @@ def user_profile():
     return render_template('user_dashboard.html', data=data, profile=True)
 
 # halaman pesan
-@application.route('/user/messages')
+@application.route('/user/messages/')
 def user_messages():
-    if 'nik' not in session:
-        return redirect(url_for('home'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
+    if 'nik' not in session:
+        return redirect(url_for('home'))
     
     openDb()
     container = []
@@ -128,42 +126,49 @@ def user_messages():
     closeDb()
     return render_template('user_messages.html', container=container, nik=session['nik'])
 
-# contact page
-@application.route('/user/contact')
-def user_contact():
-    if 'nik' not in session:
-        return redirect(url_for('home'))
+@application.route('/user/messages/<kode>/')
+def user_message(kode):
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
+    if 'nik' not in session:
+        return redirect(url_for('home'))
+    openDb()
+    cursor.execute(f"SELECT * FROM pesan WHERE kode = '{kode}'")
+    pesan = cursor.fetchone()
+    if not pesan:
+        return redirect(url_for('user_messages'))
+    isi = pesan[4].split("\n")
+    closeDb()
+    return render_template('user_message.html', pesan=pesan, isi=isi)
+
+# contact page
+@application.route('/user/contact/')
+def user_contact():
+    if 'nia' in session:
+        return redirect(url_for('admin_dashboard'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
+    if 'nik' not in session:
+        return redirect(url_for('home'))
     # html unfinished
     return render_template('contact.html', nik=session['nik'])   
 
-@application.route('/user/logout')
+@application.route('/user/logout/')
 def user_logout():
     session.pop('nik', None)
     return redirect(url_for('home'))
 
+
 @application.route('/forgot', methods=['GET','POST'])
 def forgot():
-    try:
-        #Jika sudah login sebagai user, tidak bisa login lagi, harus logout dulu
-        nik = session['nik']
-    except:
-        pass
-    else:
+    if 'nik' in session:
         return redirect(url_for('user'))
-    
-    try:
-        #Jika sudah login sebagai admin tidak bisa ke user, harus logout baru login
-        nia = session['nia']
-    except:
-        pass
-    else:
+    if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
-    
-    try: forgot = session['forgot']
-    except: pass
-    else: return redirect(url_for('forgot_entry'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
 
     if request.method == "POST":
         nik = request.form['nik']
@@ -182,26 +187,14 @@ def forgot():
 
     return render_template('forgot.html')
 
-@application.route('/forgot/entry',  methods=['GET','POST'])
+@application.route('/forgot/entry/',  methods=['GET','POST'])
 def forgot_entry():
-    try:
-        #Jika sudah login sebagai user, tidak bisa login lagi, harus logout dulu
-        nik = session['nik']
-    except:
-        pass
-    else:
+    if 'nik' in session:
         return redirect(url_for('user'))
-    
-    try:
-        #Jika sudah login sebagai admin tidak bisa ke user, harus logout baru login
-        nia = session['nia']
-    except:
-        pass
-    else:
+    if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
-    
-    try: forgot = session['forgot']
-    except KeyError:return redirect(url_for('forgot'))
+    if 'forgot' not in session:
+        return redirect(url_for('forgot'))
 
     if request.method == "POST":
         password = request.form['password']
@@ -222,18 +215,32 @@ def forgot_entry():
 
     return render_template('forgot_entry.html')
 
-@application.route('/clear_session1')
+@application.route('/clear_session1/')
 def clear_session():
     session.pop('forgot', None)
     return redirect(url_for('forgot'))
 
 # Admin Pages
+@application.route('/admin/')
+def admin():
+    if 'nik' in session:
+        return redirect(url_for('user'))
+    if 'nia' in session:
+        return redirect(url_for('admin_dashboard'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
+    return redirect(url_for('admin_login'))
+
 #fungsi view admin_dashboard() untuk menampilkan data dari basis data
-@application.route('/admin/dashboard')
+@application.route('/admin/dashboard/')
 def admin_dashboard():   
-    #Jika belum login sebagai admin tidak ke dashboard, harus login dulu
+    if 'nik' in session:
+        return redirect(url_for('user'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
     if 'nia' not in session:
         return redirect(url_for('admin_login'))
+    
     nia = session['nia']
     openDb()
     container = []
@@ -248,13 +255,8 @@ def admin_dashboard():
     closeDb()
     return render_template('admin_dashboard.html', container=container, admin=admin[0], dashboard=True)
 
-@application.route('/admin/')
-def admin():
-    if 'nia' in session:
-        return redirect(url_for('admin_dashboard'))
-    return redirect(url_for('admin_login'))
 
-@application.route('/admin/login', methods=['GET', 'POST'])
+@application.route('/admin/login/', methods=['GET', 'POST'])
 def admin_login():
     if 'nia' in session:
         return redirect(url_for('admin'))
@@ -280,8 +282,14 @@ def admin_login():
             return render_template("admin_login.html", error="Invalid NIA or password!")
     return render_template("admin_login.html")
 
-@application.route('/admin/register', methods=['GET', 'POST'])
+@application.route('/admin/register/', methods=['GET', 'POST'])
 def admin_register():
+    if 'nia' in session:
+        return redirect(url_for('admin'))
+    if 'nik' in session:
+        return redirect(url_for('user'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
     generated_nia = generate_nia()
 
     if request.method == "POST":
@@ -312,12 +320,198 @@ def admin_register():
 
 @application.route('/admin/messages/')
 def admin_messages():
+    if 'nik' in session:
+        return redirect(url_for('user'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
+    if 'nia' not in session:
+        return redirect(url_for('admin_login'))
     return render_template('admin_messages.html')
 
-@application.route('/admin/logout')
+@application.route('/admin/tambah_pesan/', methods=['GET', 'POST'])
+def admin_tambah_pesan():
+    if 'nik' in session:
+        return redirect(url_for('user'))
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
+    if 'nia' not in session:
+        return redirect(url_for('admin_login'))
+    
+    kode = generate_pesan()
+
+    if request.method == 'POST':
+        openDb()
+        cursor.execute(f"SELECT * FROM admin WHERE nia = '{session['nia']}'")
+        admin = cursor.fetchone()
+        author  = admin[1]
+        tgl = datetime.date.today()
+        judul = request.form['judul']
+        isi = request.form['isi']
+
+        closeDb()
+
+    return render_template('admin_pesan.html')
+
+@application.route('/admin/logout/')
 def admin_logout():
     session.pop('nia', None)
     return redirect(url_for('home'))
+
+
+#fungsi view tambah() untuk membuat form tambah data
+@application.route('/admin/tambah/', methods=['GET','POST'])
+def tambah():
+    if 'forgot' in session:
+        return redirect(url_for('forgot_entry'))
+    if 'nik' in session:
+        return redirect(url_for('user'))
+    if 'nia' not in session:
+        return redirect(url_for('admin_login'))
+
+    generated_nik = generate_nik()  # Memanggil fungsi untuk mendapatkan NIK otomatis
+    
+    if request.method == 'POST':
+        nik = request.form['nik']
+        password = request.form['password']
+
+        confirm_pwd = request.form['confirm_password']
+
+        if password != confirm_pwd:
+            return render_template('tambah.html', form_data=request.form, nik=generated_nik, error='Passwords do not match!')
+
+        hashed_password = generate_password_hash(password) #Hash the password
+
+        nama = request.form['nama']
+        email = request.form['email']
+        alamat = request.form['alamat']
+        tgllahir = request.form['tgllahir']
+        jeniskelamin = request.form['jeniskelamin']
+        status = request.form['status']
+        gaji = request.form['gaji']
+        foto = request.form['nik']
+
+        # Pastikan direktori upload ada
+        if not os.path.exists(UPLOAD_FOLDER):
+            os.makedirs(UPLOAD_FOLDER)
+
+        # Simpan foto dengan nama NIK
+        if 'foto' in request.files:
+            foto = request.files['foto']
+            if foto.filename != '':
+                foto.save(os.path.join(application.config['UPLOAD_FOLDER'], f"{nik}.jpg"))
+
+        openDb()
+        sql = "INSERT INTO pegawai (nik,password,email,nama,alamat,tgllahir,jeniskelamin,status,gaji,foto) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        val = (nik,hashed_password,email,nama,alamat,tgllahir,jeniskelamin,status,gaji,nik)
+        cursor.execute(sql, val)
+        conn.commit()
+        closeDb()
+        return redirect(url_for('admin_dashboard'))        
+    else:
+        return render_template('tambah.html', nik=generated_nik)  # Mengirimkan NIK otomatis ke template
+    
+#fungsi view edit() untuk form edit data
+@application.route('/admin/edit/<nik>/', methods=['GET','POST'])
+def edit(nik):
+    #Jika belum login sebagai admin tidak ke edit, harus login dulu
+    try: nia = session['nia']
+    except KeyError: return redirect(url_for('admin'))
+    
+    try:
+        #Jika sudah login sebagai user, tidak bisa ke edit, harus logout dulu
+        nik = session['nik']
+    except:
+        pass
+    else:
+        return redirect(url_for('user'))
+    
+    try: forgot = session['forgot']
+    except: pass
+    else: return redirect(url_for('forgot_entry'))
+
+    openDb()
+    cursor.execute('SELECT * FROM pegawai WHERE nik=%s', (nik))
+    data = cursor.fetchone()
+    if request.method == 'POST':
+        nik = request.form['nik']
+        nama = request.form['nama']
+        alamat = request.form['alamat']
+        tgllahir = request.form['tgllahir']
+        jeniskelamin = request.form['jeniskelamin']
+        status = request.form['status']
+        gaji = request.form['gaji']
+
+        # Check if a new file is uploaded
+        if 'foto' in request.files and request.files['foto'].filename != '':
+            # Remove the old photo if it exists
+            path_to_photo = os.path.join(application.root_path, UPLOAD_FOLDER, f'{nik}.jpg')
+            if os.path.exists(path_to_photo):
+                os.remove(path_to_photo)
+
+            # Save the new photo with the NIK name
+            foto = request.files['foto']
+            foto.save(os.path.join(application.config['UPLOAD_FOLDER'], f"{nik}.jpg"))
+            foto_filename = f"{nik}.jpg"
+        else:
+            # Keep the old photo filename
+            foto_filename = data[-1]  # Assuming the last item in data is the photo filename
+
+        sql = "UPDATE pegawai SET nama=%s, alamat=%s, tgllahir=%s, jeniskelamin=%s, status=%s, gaji=%s, foto=%s WHERE nik=%s"
+        val = (nama, alamat, tgllahir,jeniskelamin, status, gaji, foto_filename, nik)
+        cursor.execute(sql, val)
+        conn.commit()
+        closeDb()
+        return redirect(url_for('admin_dashboard'))
+    else:
+        closeDb()
+        return render_template('edit.html', data=data)
+
+#fungsi menghapus data
+@application.route('/admin/hapus/<nik>', methods=['GET','POST'])
+def hapus(nik):
+    openDb()
+    cursor.execute('DELETE FROM pegawai WHERE nik=%s', (nik,))
+    # Hapus foto berdasarkan NIK
+    path_to_photo = os.path.join(application.root_path, UPLOAD_FOLDER, f'{nik}.jpg')
+    if os.path.exists(path_to_photo):
+        os.remove(path_to_photo)
+
+    conn.commit()
+    closeDb()
+    return redirect(url_for('admin_dashboard'))
+
+#fungsi cetak ke PDF
+@application.route('/print/<nik>', methods=['GET'])
+def get_employee_data(nik):
+    # Koneksi ke database
+    connection = pymysql.connect(host='localhost',
+                                 user='root',
+                                 password='',  # Password Anda (jika ada)
+                                 db='db_pegawai',
+                                 charset='utf8mb4',
+                                 cursorclass=pymysql.cursors.DictCursor)
+
+    try:
+        with connection.cursor() as cursor:
+            # Query untuk mengambil data pegawai berdasarkan NIK
+            sql = "SELECT * FROM pegawai WHERE nik = %s"
+            cursor.execute(sql, (nik,))
+            employee_data = cursor.fetchone()  # Mengambil satu baris data pegawai
+
+            # Log untuk melihat apakah permintaan diterima dengan benar
+            print("Menerima permintaan untuk NIK:", nik)
+
+            # Log untuk melihat data yang dikirim ke klien
+            print("Data yang dikirim:", employee_data)
+
+            return jsonify(employee_data)  # Mengembalikan data sebagai JSON
+
+    except Exception as e:
+        print("Error:", e)
+        return jsonify({'error': 'Terjadi kesalahan saat mengambil data'}), 500
+
+    finally:
+        connection.close()  # Menutup koneksi database setelah selesai
 
 #Create Model
 class Users(db.Model):
@@ -407,6 +601,8 @@ def generate_nik():
     
     return next_nik
 
+# membuat kode pesan otomatis
+def generate_pesan():
 #fungsi view tambah() untuk membuat form tambah data
 @application.route('/tambah', methods=['GET','POST'])
 def tambah():
@@ -482,97 +678,18 @@ def edit(nik):
     else: return redirect(url_for('forgot_entry'))
 
     openDb()
-    cursor.execute('SELECT * FROM pegawai WHERE nik=%s', (nik))
-    data = cursor.fetchone()
-    if request.method == 'POST':
-        password = request.form['password']
+    LENGTH = 8
 
-        confirm_pwd = request.form['confirm_password']
-
-        if password != confirm_pwd:
-            return render_template('edit.html', data=data, error='Passwords do not match!')
-
-        hashed_password = generate_password_hash(password) #Hash the password
-
-        nama = request.form['nama']
-        email = request.form['email']
-        alamat = request.form['alamat']
-        tgllahir = request.form['tgllahir']
-        jeniskelamin = request.form['jeniskelamin']
-        status = request.form['status']
-        gaji = request.form['gaji']
-
-        # Check if a new file is uploaded
-        if 'foto' in request.files and request.files['foto'].filename != '':
-            # Remove the old photo if it exists
-            path_to_photo = os.path.join(application.root_path, UPLOAD_FOLDER, f'{nik}.jpg')
-            if os.path.exists(path_to_photo):
-                os.remove(path_to_photo)
-
-            # Save the new photo with the NIK name
-            foto = request.files['foto']
-            foto.save(os.path.join(application.config['UPLOAD_FOLDER'], f"{nik}.jpg"))
-            foto_filename = f"{nik}.jpg"
-        else:
-            # Keep the old photo filename
-            foto_filename = data[0] if data[0] else None  # Assuming the last item in data is the photo filename
-
-        sql = "UPDATE pegawai SET nama=%s, password=%s, alamat=%s, tgllahir=%s, jeniskelamin=%s, status=%s, gaji=%s, email=%s, foto=%s WHERE nik=%s"
-        val = (nama, hashed_password, alamat, tgllahir, jeniskelamin, status, gaji, email, foto_filename, nik)
-        cursor.execute(sql, val)
-        conn.commit()
-        closeDb()
-        return redirect(url_for('admin_dashboard'))
-    else:
-        closeDb()
-        return render_template('edit.html', data=data)
-
-#fungsi menghapus data
-@application.route('/hapus/<nik>', methods=['GET','POST'])
-def hapus(nik):
-    openDb()
-    cursor.execute('DELETE FROM pegawai WHERE nik=%s', (nik,))
-    # Hapus foto berdasarkan NIK
-    path_to_photo = os.path.join(application.root_path, UPLOAD_FOLDER, f'{nik}.jpg')
-    if os.path.exists(path_to_photo):
-        os.remove(path_to_photo)
-
-    conn.commit()
+    while True:
+        characters = string.ascii_letters + string.digits
+        generated_string = ''.join(random.choices(characters, k=LENGTH))
+        cursor.execute(f"SELECT kode FROM pesan WHERE kode = '{generated_string}'")
+        temp = cursor.fetchone()
+        if not temp[0]:
+            break
     closeDb()
-    return redirect(url_for('admin_dashboard'))
+    return generated_string
 
-#fungsi cetak ke PDF
-@application.route('/print/<nik>', methods=['GET'])
-def get_employee_data(nik):
-    # Koneksi ke database
-    connection = pymysql.connect(host='localhost',
-                                 user='root',
-                                 password='',  # Password Anda (jika ada)
-                                 db='db_pegawai',
-                                 charset='utf8mb4',
-                                 cursorclass=pymysql.cursors.DictCursor)
-
-    try:
-        with connection.cursor() as cursor:
-            # Query untuk mengambil data pegawai berdasarkan NIK
-            sql = "SELECT * FROM pegawai WHERE nik = %s"
-            cursor.execute(sql, (nik,))
-            employee_data = cursor.fetchone()  # Mengambil satu baris data pegawai
-
-            # Log untuk melihat apakah permintaan diterima dengan benar
-            print("Menerima permintaan untuk NIK:", nik)
-
-            # Log untuk melihat data yang dikirim ke klien
-            print("Data yang dikirim:", employee_data)
-
-            return jsonify(employee_data)  # Mengembalikan data sebagai JSON
-
-    except Exception as e:
-        print("Error:", e)
-        return jsonify({'error': 'Terjadi kesalahan saat mengambil data'}), 500
-
-    finally:
-        connection.close()  # Menutup koneksi database setelah selesai
 
 #Program utama     
 def main():

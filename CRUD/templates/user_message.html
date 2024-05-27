@@ -20,22 +20,13 @@
   <div class="main">
     <div class="container">
       <h2>Messages</h2>
-      <table class="table table-bordered table-hover">
-          <thead>
-              <tr>
-                  <th width="10%">Date</th>
-                  <th>Title</th>
-              </tr>
-          </thead>
-          <tbody>
-              {% for row in container %}
-              <tr>
-                  <td>{{ row[2].strftime('%d/%m/%Y') }}</td>
-                  <td><a href="/user/messages/{{ row[0] }}">{{ row[3] }}</a></td>
-              </tr>
-              {% endfor %}
-          </tbody>
-      </table>
+      <h3>{{pesan[3]}}</h3>
+        <p>by {{pesan[1]}}</p> <br>
+        {% for line in isi %}
+        <p>{{line}}</p>
+        {% endfor %}
+        <br>
+        <p>Posted on {{pesan[2]}}</p>
       
       <!-- Pagination -->
       <nav aria-label="Page navigation example">
