@@ -381,7 +381,7 @@ def admin_tambah_pesan():
         return redirect(url_for('admin_messages'))
     return render_template('admin_tambah_pesan.html')
 
-@application.route('admin/messages/edit/<kode>')
+@application.route('/admin/messages/edit/<kode>')
 def admin_edit_pesan(kode):
     if 'nik' in session:
         return redirect(url_for('user'))
@@ -476,61 +476,6 @@ def hapus(nik):
     closeDb()
     return redirect(url_for('admin_dashboard'))
 
-
-#fungsi view tambah() untuk membuat form tambah data
-@application.route('/tambah', methods=['GET','POST'])
-def tambah():
-    if 'forgot' in session:
-        return redirect(url_for('forgot_entry'))
-    if 'nik' in session:
-        return redirect(url_for('user'))
-    if 'nia' not in session:
-        return redirect(url_for('admin_login'))
-
-    generated_nik = generate_nik()  # Memanggil fungsi untuk mendapatkan NIK otomatis
-    
-    if request.method == 'POST':
-        nik = request.form['nik']
-        password = request.form['password']
-
-        confirm_pwd = request.form['confirm_password']
-
-        if password != confirm_pwd:
-            return render_template('tambah.html', form_data=request.form, nik=generated_nik,error='Passwords do not match!')
-
-        hashed_password = generate_password_hash(password) #Hash the password
-        
-        # hashed_password = request.args.get('hashed_password')
-        session['hashed_password'] = hashed_password
-
-        nama = request.form['nama']
-        email = request.form['email']
-        alamat = request.form['alamat']
-        tgllahir = request.form['tgllahir']
-        jeniskelamin = request.form['jeniskelamin']
-        status = request.form['status']
-        gaji = request.form['gaji']
-        foto = request.form['nik']
-
-        # Pastikan direktori upload ada
-        if not os.path.exists(UPLOAD_FOLDER):
-            os.makedirs(UPLOAD_FOLDER)
-
-        # Simpan foto dengan nama NIK
-        if 'foto' in request.files:
-            foto = request.files['foto']
-            if foto.filename != '':
-                foto.save(os.path.join(application.config['UPLOAD_FOLDER'], f"{nik}.jpg"))
-
-        openDb()
-        sql = "INSERT INTO pegawai (nik,password,email,nama,alamat,tgllahir,jeniskelamin,status,gaji,foto) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        val = (nik,hashed_password,email,nama,alamat,tgllahir,jeniskelamin,status,gaji,nik)
-        cursor.execute(sql, val)
-        conn.commit()
-        closeDb()
-        return redirect(url_for('admin_dashboard'))        
-    else:
-        return render_template('tambah.html', nik=generated_nik)  # Mengirimkan NIK otomatis ke template
     
 #fungsi view edit() untuk form edit data
 @application.route('/edit/<nik>', methods=['GET','POST'])
