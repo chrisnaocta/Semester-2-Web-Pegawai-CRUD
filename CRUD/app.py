@@ -68,7 +68,7 @@ def home():
 @application.route('/user/')
 def user():
     if 'nik' not in session:
-        return redirect(url_for('user'))
+        return redirect(url_for('home'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
     if 'user_forgot' in session:
@@ -115,7 +115,7 @@ def user_profile():
 # halaman pesan
 @application.route('/user/messages/')
 def user_messages():
-    if 'nik' in session:
+    if 'nik' not in session:
         return redirect(url_for('user'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
@@ -255,7 +255,7 @@ def admin_dashboard():
     if 'nik' in session:
         return redirect(url_for('user'))
     if 'nia' not in session:
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('admin'))
     if 'user_forgot' in session:
         return redirect(url_for('user_forgot_entry'))
     if 'admin_forgot' in session:
@@ -280,7 +280,7 @@ def admin_login():
     if 'nik' in session:
         return redirect(url_for('user'))
     if 'nia' in session:
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('admin'))
     if 'user_forgot' in session:
         return redirect(url_for('user_forgot_entry'))
     if 'admin_forgot' in session:
@@ -308,7 +308,7 @@ def admin_register():
     if 'nik' in session:
         return redirect(url_for('user'))
     if 'nia' in session:
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('admin'))
     if 'user_forgot' in session:
         return redirect(url_for('user_forgot_entry'))
     if 'admin_forgot' in session:
@@ -406,13 +406,12 @@ def admin_forgot_entry():
 
     return render_template('admin_forgot_entry.html')
 
-
 @application.route('/admin/messages/')
 def admin_messages():
     if 'nik' in session:
         return redirect(url_for('user'))
     if 'nia' not in session:
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('admin'))
     if 'user_forgot' in session:
         return redirect(url_for('user_forgot_entry'))
     if 'admin_forgot' in session:
@@ -432,7 +431,7 @@ def admin_message(kode):
     if 'nik' in session:
         return redirect(url_for('user'))
     if 'nia' not in session:
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('admin'))
     if 'user_forgot' in session:
         return redirect(url_for('user_forgot_entry'))
     if 'admin_forgot' in session:
@@ -452,7 +451,7 @@ def admin_tambah_pesan():
     if 'nik' in session:
         return redirect(url_for('user'))
     if 'nia' not in session:
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('admin'))
     if 'user_forgot' in session:
         return redirect(url_for('user_forgot_entry'))
     if 'admin_forgot' in session:
@@ -481,7 +480,7 @@ def admin_edit_pesan(kode):
     if 'nik' in session:
         return redirect(url_for('user'))
     if 'nia' not in session:
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('admin'))
     if 'user_forgot' in session:
         return redirect(url_for('user_forgot_entry'))
     if 'admin_forgot' in session:
@@ -511,7 +510,7 @@ def admin_hapus_pesan(kode):
     if 'nik' in session:
         return redirect(url_for('user'))
     if 'nia' not in session:
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('admin'))
     if 'user_forgot' in session:
         return redirect(url_for('user_forgot_entry'))
     if 'admin_forgot' in session:
@@ -534,7 +533,7 @@ def tambah():
     if 'nik' in session:
         return redirect(url_for('user'))
     if 'nia' not in session:
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('admin'))
     if 'user_forgot' in session:
         return redirect(url_for('user_forgot_entry'))
     if 'admin_forgot' in session:
@@ -588,7 +587,7 @@ def edit(nik):
     if 'nik' in session:
         return redirect(url_for('user'))
     if 'nia' not in session:
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('admin'))
     if 'user_forgot' in session:
         return redirect(url_for('user_forgot_entry'))
     if 'admin_forgot' in session:
@@ -645,7 +644,7 @@ def hapus(nik):
     if 'nik' in session:
         return redirect(url_for('user'))
     if 'nia' not in session:
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('admin'))
     if 'user_forgot' in session:
         return redirect(url_for('user_forgot_entry'))
     if 'admin_forgot' in session:
