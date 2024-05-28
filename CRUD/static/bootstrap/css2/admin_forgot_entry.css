@@ -1,0 +1,23 @@
+.container
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    /* margin-top: 100px; */
+}       
+
+.card {
+    width: 100%;
+    max-width: 916px;
+    height: 300px; /* Adjust the height as needed */
+}
+
+.password-toggle-icon {
+    position: relative;
+    right: -690px;  /* Adjust this value to move the icon horizontally */
+    top: -30px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #333;  /* Adjust the color as needed */
+  }

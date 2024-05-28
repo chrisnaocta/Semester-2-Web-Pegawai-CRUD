@@ -1,0 +1,19 @@
+.container
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    /* margin-top: 100px; */
+}       
+
+.card {
+    width: 100%;
+    max-width: 600px;
+    height: 255px; /* Adjust the height as needed */
+}
+
+.email-input1
+{
+    margin-bottom: -30px;
+}
