@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_mysqldb import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -24,6 +24,10 @@ mysql = MySQL(application)
 UPLOAD_FOLDER = 'E:\FILE OCTA\KULIAH\SEMESTER 2\WEB OOP\Web_Pegawai\CRUD\static\images'
 application.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+#fungsi untuk menyimpan lokasi file message
+UPLOAD_FOLDER2 = 'E:\\FILE OCTA\\KULIAH\\SEMESTER 2\\WEB OOP\\Web_Pegawai\\CRUD\\static\\files'
+application.config['UPLOAD_FOLDER2'] = UPLOAD_FOLDER2
+
 #fungsi koneksi ke basis data
 def openDb():
     global conn, cursor
@@ -35,6 +39,11 @@ def closeDb():
     global conn, cursor
     cursor.close()
     conn.close()
+
+@application.route('/download/<filename>')
+def download_file(filename):
+    directory = 'E:\\FILE OCTA\\KULIAH\\SEMESTER 2\\WEB OOP\\Web_Pegawai\\CRUD\\static\\files'
+    return send_from_directory(directory, filename, as_attachment=True)
 
 @application.route('/', methods=['GET','POST'])
 def home():
@@ -438,7 +447,11 @@ def admin_message(kode):
         return redirect(url_for('admin_forgot_entry'))
     
     openDb()
-    cursor.execute(f"SELECT * FROM pesan WHERE kode = '{kode}'")
+    # cursor.execute("SELECT judul FROM pesan WHERE kode = %s", (kode,))
+    # row = cursor.fetchone()
+    # if row:
+    #     judul3 = row[0]
+    cursor.execute("SELECT * FROM pesan WHERE kode = %s", (kode,))
     pesan = cursor.fetchone()
     if not pesan:
         return redirect(url_for('admin_messages'))
@@ -464,11 +477,19 @@ def admin_tambah_pesan():
         cursor.execute(f"SELECT * FROM admin WHERE nia = '{session['nia']}'")
         admin = cursor.fetchone()
         author  = admin[1]
+        email = admin[3]
         tgl = datetime.date.today()
         judul = request.form['judul']
         isi = request.form['isi']
+        file = request.form['judul']
 
-        sql = f"INSERT INTO pesan (kode,author,tgl,judul,isi) VALUES ('{kode}', '{author}', '{tgl}', '{judul}', '{isi}')"
+        # Simpan file dengan nama kode
+        if 'file' in request.files:
+            file = request.files['file']
+            if file.filename != '':
+                file.save(os.path.join(application.config['UPLOAD_FOLDER2'], f"{judul}.pdf"))
+
+        sql = f"INSERT INTO pesan (kode,author,tgl,judul,isi, email, file) VALUES ('{kode}', '{author}', '{tgl}', '{judul}', '{isi}', '{email}', '{judul}')"
         cursor.execute(sql)
         conn.commit()
         closeDb()
@@ -517,6 +538,15 @@ def admin_hapus_pesan(kode):
         return redirect(url_for('admin_forgot_entry'))
     
     openDb()
+    cursor.execute("SELECT judul FROM pesan WHERE kode = %s", (kode,))
+    row = cursor.fetchone()
+    if row:
+        judul = row[0]
+        # Hapus file berdasarkan judul
+        path_to_file = os.path.join(application.root_path, UPLOAD_FOLDER2, f'{judul}.pdf')
+        if os.path.exists(path_to_file):
+            os.remove(path_to_file)
+
     cursor.execute(f"DELETE FROM pesan WHERE kode='{kode}'")
     conn.commit()
     closeDb()
