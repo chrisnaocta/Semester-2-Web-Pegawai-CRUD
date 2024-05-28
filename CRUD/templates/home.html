@@ -29,7 +29,7 @@
             </div>
             <!-- /.card-header -->
             {% if error %}
-                <p style="color: red; text-align: center; font-weight: bold;">{{error}}</p>
+                <p style="font-size: 13px; margin-bottom: -17px; color: red; text-align: center; font-weight: bold;">{{error}}</p>
             {% endif %}
             <!-- form start -->
             <form class="form-horizontal" method="POST" action="/">
@@ -64,7 +64,7 @@
                     <button type="submit" class="btn btn-info">Log in</button>
                     <!-- <button type="submit" class="btn btn-default">Cancel</button> -->
                     <div class="mt-2">
-                        <a href="/forgot" class="btn btn-link">Forgot Password?</a>
+                        <a href="/user/forgot" class="btn btn-link">Forgot Password?</a>
                         <a href="/admin/login" class="btn btn-link">Login As Admin</a>
                     </div>
                 </div>

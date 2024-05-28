@@ -36,18 +36,16 @@ def closeDb():
     cursor.close()
     conn.close()
 
-@application.route('/general/')
-def general():
-    return render_template('general.html')
-
 @application.route('/', methods=['GET','POST'])
 def home():
     if 'nik' in session:
         return redirect(url_for('user'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
-    if 'forgot' in session:
-        return redirect(url_for('forgot_entry'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
 
     if request.method == "POST":
         nik = request.form.get('nik')
@@ -69,22 +67,27 @@ def home():
 # User Pages
 @application.route('/user/')
 def user():
+    if 'nik' not in session:
+        return redirect(url_for('user'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
-    if 'forgot' in session:
-        return redirect(url_for('forgot_entry'))
-    if 'nik' not in session:
-        return redirect(url_for('home'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
     return redirect(url_for('user_dashboard'))
 
 @application.route('/user/dashboard/')
 def user_dashboard():
+    if 'nik' not in session:
+        return redirect(url_for('user'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
-    if 'forgot' in session:
-        return redirect(url_for('forgot_entry'))
-    if 'nik' not in session:
-        return redirect(url_for('home'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
+    
     nik = session['nik']
     openDb()
     cursor.execute(f"SELECT * FROM pegawai WHERE nik = '{nik}'")
@@ -94,12 +97,14 @@ def user_dashboard():
 
 @application.route('/user/profile/')
 def user_profile():
+    if 'nik' not in session:
+        return redirect(url_for('user'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
-    if 'forgot' in session:
-        return redirect(url_for('forgot_entry'))
-    if 'nik' not in session:
-        return redirect(url_for('home'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
     nik = session['nik']
     openDb()
     cursor.execute(f"SELECT * FROM pegawai WHERE nik = '{nik}'")
@@ -110,12 +115,14 @@ def user_profile():
 # halaman pesan
 @application.route('/user/messages/')
 def user_messages():
+    if 'nik' in session:
+        return redirect(url_for('user'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
-    if 'forgot' in session:
-        return redirect(url_for('forgot_entry'))
-    if 'nik' not in session:
-        return redirect(url_for('home'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
     
     openDb()
     container = []
@@ -128,12 +135,15 @@ def user_messages():
 
 @application.route('/user/messages/<kode>/')
 def user_message(kode):
+    if 'nik' not in session:
+        return redirect(url_for('user'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
-    if 'forgot' in session:
-        return redirect(url_for('forgot_entry'))
-    if 'nik' not in session:
-        return redirect(url_for('home'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
+    
     openDb()
     cursor.execute(f"SELECT * FROM pesan WHERE kode = '{kode}'")
     pesan = cursor.fetchone()
@@ -146,12 +156,15 @@ def user_message(kode):
 # contact page
 @application.route('/user/contact/')
 def user_contact():
+    if 'nik' not in session:
+        return redirect(url_for('user'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
-    if 'forgot' in session:
-        return redirect(url_for('forgot_entry'))
-    if 'nik' not in session:
-        return redirect(url_for('home'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
+    
     # html unfinished
     return render_template('contact.html', nik=session['nik'])   
 
@@ -160,15 +173,16 @@ def user_logout():
     session.pop('nik', None)
     return redirect(url_for('home'))
 
-
-@application.route('/forgot/', methods=['GET','POST'])
-def forgot():
+@application.route('/user/forgot/', methods=['GET','POST'])
+def user_forgot():
     if 'nik' in session:
         return redirect(url_for('user'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
-    if 'forgot' in session:
-        return redirect(url_for('forgot_entry'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
 
     if request.method == "POST":
         nik = request.form['nik']
@@ -180,45 +194,47 @@ def forgot():
         cur.close()
         
         if user:
-            session['forgot'] = user[0]
-            return redirect(url_for('forgot_entry'))
+            session['user_forgot'] = user[0]
+            return redirect(url_for('user_forgot_entry'))
         else:
-            return render_template('forgot.html', error='Invalid nik or email!!!')
+            return render_template('user_forgot.html', error='Invalid NIK or Email!!!')
 
-    return render_template('forgot.html')
+    return render_template('user_forgot.html')
 
-@application.route('/forgot/entry/',  methods=['GET','POST'])
-def forgot_entry():
+@application.route('/user/forgot/entry/',  methods=['GET','POST'])
+def user_forgot_entry():
     if 'nik' in session:
         return redirect(url_for('user'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
-    if 'forgot' not in session:
-        return redirect(url_for('forgot'))
+    if 'user_forgot' not in session:
+        return redirect(url_for('user_forgot'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
 
     if request.method == "POST":
         password = request.form['password']
         confirm_pwd = request.form['confirm_password']
 
         if password != confirm_pwd:
-            return render_template('forgot_entry.html', error='Passwords do not match!')
+            return render_template('user_forgot_entry.html', error='Passwords do not match!')
 
         hashed_password = generate_password_hash(password) #Hash the password
 
         cur = mysql.connection.cursor()
-        cur.execute(f"UPDATE pegawai SET password=%s WHERE nik=%s", (hashed_password, forgot))
+        cur.execute(f"UPDATE pegawai SET password=%s WHERE nik=%s", (hashed_password, session['user_forgot']))
         mysql.connection.commit()
         cur.close()
 
-        session.pop('forgot', None)
+        session.pop('user_forgot', None)
         return redirect(url_for('home'))
 
-    return render_template('forgot_entry.html')
+    return render_template('user_forgot_entry.html')
 
 @application.route('/clear_session1/')
-def clear_session():
-    session.pop('forgot', None)
-    return redirect(url_for('forgot'))
+def clear_session1():
+    session.pop('user_forgot', None)
+    return redirect(url_for('user_forgot'))
 
 # Admin Pages
 @application.route('/admin/')
@@ -227,8 +243,10 @@ def admin():
         return redirect(url_for('user'))
     if 'nia' in session:
         return redirect(url_for('admin_dashboard'))
-    if 'forgot' in session:
-        return redirect(url_for('forgot_entry'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
     return redirect(url_for('admin_login'))
 
 #fungsi view admin_dashboard() untuk menampilkan data dari basis data
@@ -236,10 +254,12 @@ def admin():
 def admin_dashboard():   
     if 'nik' in session:
         return redirect(url_for('user'))
-    if 'forgot' in session:
-        return redirect(url_for('forgot_entry'))
     if 'nia' not in session:
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('admin_dashboard'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
     
     nia = session['nia']
     openDb()
@@ -255,15 +275,16 @@ def admin_dashboard():
     closeDb()
     return render_template('admin_dashboard.html', container=container, admin=admin[0], home=True)
 
-
 @application.route('/admin/login/', methods=['GET', 'POST'])
 def admin_login():
-    if 'nia' in session:
-        return redirect(url_for('admin'))
     if 'nik' in session:
         return redirect(url_for('user'))
-    if 'forgot' in session:
-        return redirect(url_for('forgot_entry'))
+    if 'nia' in session:
+        return redirect(url_for('admin_dashboard'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
 
     if request.method == "POST":
         nia = request.form["nia"]
@@ -284,17 +305,21 @@ def admin_login():
 
 @application.route('/admin/register/', methods=['GET', 'POST'])
 def admin_register():
-    if 'nia' in session:
-        return redirect(url_for('admin'))
     if 'nik' in session:
         return redirect(url_for('user'))
-    if 'forgot' in session:
-        return redirect(url_for('forgot_entry'))
+    if 'nia' in session:
+        return redirect(url_for('admin_dashboard'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
+    
     generated_nia = generate_nia()
 
     if request.method == "POST":
         nia = request.form["nia"]
         nama = request.form["nama"]
+        email = request.form["email"]
 
         password = request.form['password']
 
@@ -311,22 +336,87 @@ def admin_register():
 
         openDb()
         # SQL SYNTAX untuk memasukan username dan password di tabel karyawan
-        cursor.execute(f"INSERT INTO admin(nia, nama, password) values('{nia}', '{nama}', '{hashed_password}')")
+        cursor.execute(f"INSERT INTO admin(nia, nama, password, email) values('{nia}', '{nama}', '{hashed_password}', '{email}')")
         conn.commit()
         closeDb()
         return redirect(url_for("admin_login"))
     
     return render_template('admin_register.html', nia=generated_nia)
 
+@application.route('/clear_session2/')
+def clear_session2():
+    session.pop('admin_forgot', None)
+    return redirect(url_for('admin_forgot'))
+
+@application.route('/admin/forgot/', methods=['GET','POST'])
+def admin_forgot():
+    if 'nik' in session:
+        return redirect(url_for('user'))
+    if 'nia' in session:
+        return redirect(url_for('admin_dashboard'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
+
+    if request.method == "POST":
+        nia = request.form['nia']
+        email = request.form['email']
+        cur = mysql.connection.cursor()
+
+        cur.execute(f"SELECT nia, email FROM admin WHERE nia=%s AND email=%s", (nia,email))
+        user = cur.fetchone()
+        cur.close()
+        
+        if user:
+            session['admin_forgot'] = user[0]
+            return redirect(url_for('admin_forgot_entry'))
+        else:
+            return render_template('admin_forgot.html', error='Invalid NIA or Email!!!')
+
+    return render_template('admin_forgot.html')
+
+@application.route('/admin/forgot/entry/',  methods=['GET','POST'])
+def admin_forgot_entry():
+    if 'nik' in session:
+        return redirect(url_for('user'))
+    if 'nia' in session:
+        return redirect(url_for('admin_dashboard'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' not in session:
+        return redirect(url_for('admin_forgot_entry'))
+
+    if request.method == "POST":
+        password = request.form['password']
+        confirm_pwd = request.form['confirm_password']
+
+        if password != confirm_pwd:
+            return render_template('forgot_entry.html', error='Passwords do not match!')
+
+        hashed_password = generate_password_hash(password) #Hash the password
+
+        cur = mysql.connection.cursor()
+        cur.execute(f"UPDATE admin SET password=%s WHERE nia=%s", (hashed_password, session['admin_forgot']))
+        mysql.connection.commit()
+        cur.close()
+
+        session.pop('admin_forgot', None)
+        return redirect(url_for('admin_login'))
+
+    return render_template('admin_forgot_entry.html')
+
 
 @application.route('/admin/messages/')
 def admin_messages():
     if 'nik' in session:
         return redirect(url_for('user'))
-    if 'forgot' in session:
-        return redirect(url_for('forgot_entry'))
     if 'nia' not in session:
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('admin_dashboard'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
     
     openDb()
     container = []
@@ -340,11 +430,14 @@ def admin_messages():
 @application.route('/admin/messages/<kode>/')
 def admin_message(kode):
     if 'nik' in session:
-        return redirect(url_for('user_dashboard'))
-    if 'forgot' in session:
-        return redirect(url_for('forgot_entry'))
+        return redirect(url_for('user'))
     if 'nia' not in session:
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('admin_dashboard'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
+    
     openDb()
     cursor.execute(f"SELECT * FROM pesan WHERE kode = '{kode}'")
     pesan = cursor.fetchone()
@@ -358,10 +451,12 @@ def admin_message(kode):
 def admin_tambah_pesan():
     if 'nik' in session:
         return redirect(url_for('user'))
-    if 'forgot' in session:
-        return redirect(url_for('forgot_entry'))
     if 'nia' not in session:
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('admin_dashboard'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
     
     kode = generate_pesan()
 
@@ -385,10 +480,12 @@ def admin_tambah_pesan():
 def admin_edit_pesan(kode):
     if 'nik' in session:
         return redirect(url_for('user'))
-    if 'forgot' in session:
-        return redirect(url_for('forgot_entry'))
     if 'nia' not in session:
-        return redirect(url_for('admin_login'))   
+        return redirect(url_for('admin_dashboard'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))   
     
     openDb()
     cursor.execute('SELECT * FROM pesan WHERE kode=%s', (kode))
@@ -413,10 +510,13 @@ def admin_edit_pesan(kode):
 def admin_hapus_pesan(kode):
     if 'nik' in session:
         return redirect(url_for('user'))
-    if 'forgot' in session:
-        return redirect(url_for('forgot_entry'))
     if 'nia' not in session:
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('admin_dashboard'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
+    
     openDb()
     cursor.execute(f"DELETE FROM pesan WHERE kode='{kode}'")
     conn.commit()
@@ -431,12 +531,14 @@ def admin_logout():
 #fungsi view tambah() untuk membuat form tambah data
 @application.route('/admin/tambah/', methods=['GET','POST'])
 def tambah():
-    if 'forgot' in session:
-        return redirect(url_for('forgot_entry'))
     if 'nik' in session:
         return redirect(url_for('user'))
     if 'nia' not in session:
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('admin_dashboard'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
 
     generated_nik = generate_nik()  # Memanggil fungsi untuk mendapatkan NIK otomatis
     
@@ -485,10 +587,12 @@ def tambah():
 def edit(nik):
     if 'nik' in session:
         return redirect(url_for('user'))
-    if 'forgot' in session:
-        return redirect(url_for('forgot_entry'))
     if 'nia' not in session:
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('admin_dashboard'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
 
     openDb()
     cursor.execute('SELECT * FROM pegawai WHERE nik=%s', (nik))
@@ -540,10 +644,13 @@ def edit(nik):
 def hapus(nik):
     if 'nik' in session:
         return redirect(url_for('user'))
-    if 'forgot' in session:
-        return redirect(url_for('forgot_entry'))
     if 'nia' not in session:
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('admin_dashboard'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
+    
     openDb()
     cursor.execute('DELETE FROM pegawai WHERE nik=%s', (nik,))
     # Hapus foto berdasarkan NIK

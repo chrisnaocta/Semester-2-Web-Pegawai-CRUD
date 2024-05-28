@@ -4,40 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css2/forgot_entry.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css2/forgot.css') }}">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-    <title>Forgot entry</title>
+    <title>Forgot Password</title>
 </head>
 <body>
     <div class="container">
-        <h1 style="text-align: center; margin-bottom: 10px;">Enter New Password</h1>
+        <h1 style="text-align: center; margin-bottom: 10px;">Reset Password</h1>
         {% if error %}
-            <p style="color: red; font-weight: bold;">{{error}}</p>
+            <p style="color: red; text-align: center; font-weight: bold;">{{error}}</p>
         {% endif %}
-        <div class="password-box">
-            <form method="POST" action="/forgot/entry">
-                <div class="password-input">
-                    <label for="password">Password:</label>
-                    <input type="password" class="form-control" id="password" name="password" minlength="8" required>
+        <div class="email-box">
+            <form method="POST" action="/admin/forgot/">
+                <div clas="email-input">
+                    <label for="nia">NIA:</label>
+                    <input type="text" class="form-control" name="nia" id="nia" required>
                 </div>
-                <div class="password-input">
-                    <label for="password">Confirm Password:</label>
-                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" minlength="8" required>
+                <div class="email-input">
+                    <label for="email">Email:</label>
+                    <input type="email" class="form-control" name="email" id="email" required>
                 </div>
                 <div class="text-center submit-btn">
                     <input type="submit" class="btn btn-primary " value="submit">
                 </div>
                 <div class="text-center cancel-btn">
                     <button class="btn btn-danger" >
-                        <a style="color: white; text-decoration: none;" href="/clear_session1"> Cancel</a>
+                        <a style="color: white; text-decoration: none;" href="/admin/login"> Cancel</a>
                     </button>
                 </div>
             </form>
         </div>
     </div>
+    
 </body>
 </html>
