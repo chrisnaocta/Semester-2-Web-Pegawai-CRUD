@@ -2,10 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/admin_dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css2/admin_message.css') }}">
     <title>Messages</title>
+
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <!-- <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='adminlte/plugins/fontawesome-free/css/all.min.css') }}">
+    <!-- Theme style -->
+    <!-- <link rel="stylesheet" href="../../dist/css/adminlte.min.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='adminlte/dist/css/adminlte.min_5.css') }}">
+
+    <!-- Include Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Include FontAwesome for the arrow icon -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <!-- Include Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <body>
     <!-- Side navigation -->
@@ -15,25 +33,117 @@
       <a {% if messages %}class="checked"{% endif %} href="/admin/messages">Messages</a>
       <a href="/admin/logout" onclick="return confirm('Anda yakin mau logout?')">Log Out</a>
     </div>
-  <!-- Page content -->
-  <div class="main">
-    <div class="container">
-      <a href="/user/messages">← Back to Messages</a>
-      <h3>{{pesan[3]}}</h3>
-      {% if pesan[5] == 0 %}
-        <p>Posted on {{pesan[2]}} by {{pesan[1]}}</p>
-      {% else %}
-        <p>Last edited on {{pesan[2]}} by {{pesan[1]}}</p>
-      {% endif %}
-      <br>
-        {% for line in isi %}
-        <p>{{line}}</p>
-        {% endfor %}
-        <div>
-          <a href="/admin/messages/edit/{{pesan[0]}}" class="btn btn-warning" role="button">Edit</a>
-          <a href="/admin/messages/hapus/{{pesan[0]}}" class="btn btn-danger" role="button" onclick="return confirm('Apakah Anda yakin ingin menghapus pesan ini?')">Delete</a>
+
+    <div style="margin-left: 170px;" class="container mt-4">
+      <button class="btn btn-primary" onclick="goToMessages()">
+          <i class="fas fa-arrow-left"></i> Back
+      </button>
+      <a href="/admin/messages/edit/{{pesan[0]}}" class="btn btn-warning" role="button">
+        Edit
+      </a>
+
+      <a href="/admin/messages/hapus/{{pesan[0]}}" class="btn btn-danger" role="button" onclick="return confirm('Apakah Anda yakin ingin menghapus pesan ini?')">
+        Delete
+      </a>
+    </div>
+    
+  <div class="container1">
+    
+    <div class="col-md-9">
+      <div class="card card-primary card-outline">
+        <div class="card-header">
+          <h3 style="text-align: center;" class="card-title">Pesan untuk pegawai dari admin</h3>
         </div>
+        <!-- /.card-header -->
+        <div class="card-body p-0">
+          <div class="mailbox-read-info">
+            <div class="message-row">
+              <div class="message-label">
+                <h5>Judul:</h5>
+              </div>
+              <div class="message-content">
+                <h5>{{pesan[3]}}</h5>
+              </div>
+            </div>
+            <div class="message-row">
+              <div class="message-label">
+                <h5>Dari:
+              </div>
+              <div class="message-content">
+                <h5>{{pesan[5]}}
+                  <span class="mailbox-read-time float-right">{{pesan[2].strftime('%A, %d-%m-%Y') }}</span>
+              </h5>
+              </div>
+            </div>
+          </div>
+          <!-- /.mailbox-read-info -->
+          
+          <div class="mailbox-read-message">
+            {% for line in isi %}
+              <p>{{line}}</p>
+            {% endfor %}
+  
+            <p>Terimakasih,<br>{{pesan[1]}}</p>
+          </div>
+          <!-- /.mailbox-read-message -->
+        </div>
+        <!-- /.card-body -->
+
+        <div class="card-footer bg-white">
+          <ul class="mailbox-attachments d-flex align-items-stretch clearfix">
+            <li>
+              <span class="mailbox-attachment-icon"><i class="far fa-file-pdf"></i></span>
+  
+              <div class="mailbox-attachment-info">
+                <!-- <a id="downloadLink" href="#" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i>{{pesan[3]}}.pdf</a> -->
+                {% if kosong %}
+                  <p style="color: red; font-weight: bold;">{{error}}</p>
+                {% else %}
+                <a id="downloadLink" href="{{ url_for('download_file', filename=pesan[3] + '.pdf') }}" class="mailbox-attachment-name">
+                  <i class="fas fa-paperclip"></i>{{ pesan[3] }}.pdf
+                </a>
+                {% endif %}    
+                      <!-- <span class="mailbox-attachment-size clearfix mt-1"> -->
+                      <!-- <span>1,245 KB</span> -->
+                      <!-- <a id="downloadLink" class="btn btn-default btn-sm float-right">
+                        <i class="fas fa-cloud-download-alt"></i>
+                      </a> -->
+                      <!-- </span> -->
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
-  </div> 
+
+    <a href="/admin/messages/edit/{{pesan[0]}}" class="btn btn-warning" role="button">Edit</a>
+    <a href="/admin/messages/hapus/{{pesan[0]}}" class="btn btn-danger" role="button" onclick="return confirm('Apakah Anda yakin ingin menghapus pesan ini?')">Delete</a>
+
 </body>
+
+<script>
+  function goToMessages() {
+        window.location.href = "/admin/messages";
+    }
+
+    // Get the download link element
+    const downloadLink = document.getElementById('downloadLink');
+
+    // Add click event listener
+    downloadLink.addEventListener('click', function() {
+      // Prevent the default behavior (navigating to "#")
+      event.preventDefault();
+
+      // Get the file name from the message data
+      const judul = '{{ pesan[3] }}';
+
+      // Construct the file path with the file name
+      const filePath = `E:\\FILE OCTA\\KULIAH\\SEMESTER 2\\WEB OOP\\Web_Pegawai\\CRUD\\static\\files\\${judul}.pdf`;
+      
+      // Navigate to the file path
+      window.location.href = filePath;
+    });
+</script>
+
 </html>
