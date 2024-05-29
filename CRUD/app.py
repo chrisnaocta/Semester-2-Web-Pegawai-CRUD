@@ -156,11 +156,17 @@ def user_message(kode):
     openDb()
     cursor.execute(f"SELECT * FROM pesan WHERE kode = '{kode}'")
     pesan = cursor.fetchone()
+    closeDb()
     if not pesan:
         return redirect(url_for('user_messages'))
+    
     isi = pesan[4].split("\n")
-    closeDb()
-    return render_template('user_message.html', pesan=pesan, isi=isi, messages=True)
+
+    # Check if the file column (pesan[6]) is empty
+    if not pesan[6]:
+        return render_template('user_message.html', kosong=True, error='Tidak ada file terlampir' ,pesan=pesan, isi = isi, messages=True)
+    
+    return render_template('user_message.html', kosong=False, pesan=pesan, isi=isi, messages=True)
 
 # contact page
 @application.route('/user/contact/')
@@ -483,13 +489,15 @@ def admin_tambah_pesan():
         isi = request.form['isi']
         file = request.form['judul']
 
-        # Simpan file dengan nama kode
-        if 'file' in request.files:
+        # Check if a new file is uploaded
+        if 'file' in request.files and request.files['file'].filename != '':
             file = request.files['file']
-            if file.filename != '':
-                file.save(os.path.join(application.config['UPLOAD_FOLDER2'], f"{judul}.pdf"))
+            file.save(os.path.join(application.config['UPLOAD_FOLDER2'], f"{judul}.pdf"))
+            file_name = f"{judul}.pdf"
+        else:
+            file_name = ""
 
-        sql = f"INSERT INTO pesan (kode,author,tgl,judul,isi, email, file) VALUES ('{kode}', '{author}', '{tgl}', '{judul}', '{isi}', '{email}', '{judul}')"
+        sql = f"INSERT INTO pesan (kode,author,tgl,judul,isi, email, file) VALUES ('{kode}', '{author}', '{tgl}', '{judul}', '{isi}', '{email}', '{file_name}')"
         cursor.execute(sql)
         conn.commit()
         closeDb()
