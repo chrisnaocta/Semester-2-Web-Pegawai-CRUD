@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/dashboard.css') }}">
-    {% if welcome %}
     <title>Welcome</title>
-    {% else %}
-    <title>Profile</title>
-    {% endif %}
 </head>
 <body>
     <!-- Side navigation -->
@@ -23,25 +19,30 @@
   <!-- Page content -->
   <div class="main">
     <div class="container">
-        <h1>Welcome, {{ data[1] }}</h1>
-        <a href="/user/profile"></a>
-      <h2>Recent Messages</h2>
-      <table class="table table-bordered table-hover">
-          <thead>
-              <tr>
-                  <th width="10%">Date</th>
-                  <th>Title</th>
-              </tr>
-          </thead>
-          <tbody>
-              {% for row in container %}
-              <tr>
-                  <td>{{ row[2].strftime('%d/%m/%Y') }}</td>
-                  <td><a href="/user/messages/{{ row[0] }}">{{ row[3] }}</a></td>
-              </tr>
-              {% endfor %}
-          </tbody>
-      </table>
+    <div class="item">
+        <h1 class="welcome">Welcome, {{ data[1] }}</h1>
+        <a class="links" href="/user/profile">Go to profile →</a>
+    </div>
+    <div class="item">
+        <h2>Recent Messages</h2>
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th width="10%">Date</th>
+                    <th>Title</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in container %}
+                <tr>
+                    <td class="date">{{ row[2].strftime('%d/%m/%Y') }}</td>
+                    <td><a href="/user/messages/{{ row[0] }}">{{ row[3] }}</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a class="links" href="/user/messages">See more messages →</a>
+    </div>
     </div>
   </div> 
 </body>

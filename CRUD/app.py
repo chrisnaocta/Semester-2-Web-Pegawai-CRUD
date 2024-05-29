@@ -21,7 +21,8 @@ db = SQLAlchemy(application)
 mysql = MySQL(application)
 
 #fungsi untuk menyimpan lokasi foto
-UPLOAD_FOLDER = 'E:\FILE OCTA\KULIAH\SEMESTER 2\WEB OOP\Web_Pegawai\CRUD\static\images'
+#UPLOAD_FOLDER = 'E:\FILE OCTA\KULIAH\SEMESTER 2\WEB OOP\Web_Pegawai\CRUD\static\images'
+UPLOAD_FOLDER = 'static\images'
 application.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 #fungsi untuk menyimpan lokasi file message
@@ -97,12 +98,20 @@ def user_dashboard():
     if 'admin_forgot' in session:
         return redirect(url_for('admin_forgot_entry'))
     
+    today = datetime.date.today()
     nik = session['nik']
     openDb()
     cursor.execute(f"SELECT * FROM pegawai WHERE nik = '{nik}'")
     data = cursor.fetchone()
+    container = []
+    cursor.execute(f"SELECT * FROM pesan ORDER BY tgl DESC")
+    result = cursor.fetchall()
+    for message in result:
+        container.append(message)
+        if len(container) >= 5:
+            break
     closeDb()
-    return render_template('user_dashboard.html', data=data, home=True)
+    return render_template('user_dashboard.html', data=data, container=container, home=True)
 
 @application.route('/user/profile/')
 def user_profile():
