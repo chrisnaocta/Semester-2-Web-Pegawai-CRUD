@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/admin_dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css2/admin_message.css') }}">
     <title>Messages</title>
 
@@ -31,6 +31,7 @@
       <a {% if home %}class="checked"{% endif %} href="/admin">Home</a>
       <a {% if profile %}class="checked"{% endif %} href="/admin/profile">Profile</a>
       <a {% if messages %}class="checked"{% endif %} href="/admin/messages">Messages</a>
+      <a {% if cuti %}class="checked"{% endif %} href="/admin/cuti">Cuti</a>
       <a href="/admin/logout" onclick="return confirm('Anda yakin mau logout?')">Log Out</a>
     </div>
 
