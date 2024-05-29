@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, session, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session
+from flask import send_from_directory, send_file
 from flask_sqlalchemy import SQLAlchemy
 from flask_mysqldb import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
 import pymysql.cursors, os, datetime, random, string
 
@@ -20,11 +22,11 @@ application.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://username:password@local
 db = SQLAlchemy(application)    
 mysql = MySQL(application)
 
-#fungsi untuk menyimpan lokasi foto
+#variabel untuk menyimpan lokasi foto
 UPLOAD_FOLDER = 'E:\FILE OCTA\KULIAH\SEMESTER 2\WEB OOP\Web_Pegawai\CRUD\static\images'
 application.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-#fungsi untuk menyimpan lokasi file message
+#variabel untuk menyimpan lokasi file message
 UPLOAD_FOLDER2 = 'E:\\FILE OCTA\\KULIAH\\SEMESTER 2\\WEB OOP\\Web_Pegawai\\CRUD\\static\\files'
 application.config['UPLOAD_FOLDER2'] = UPLOAD_FOLDER2
 
@@ -102,7 +104,16 @@ def user_dashboard():
     cursor.execute(f"SELECT * FROM pegawai WHERE nik = '{nik}'")
     data = cursor.fetchone()
     closeDb()
-    return render_template('user_dashboard.html', data=data, home=True)
+
+    openDb()
+    container = []
+    cursor.execute(f"SELECT * FROM pesan ORDER BY tgl DESC")
+    result = cursor.fetchall()
+    for message in result:
+        container.append(message)
+    closeDb()
+
+    return render_template('user_dashboard.html', data=data, home=True, container=container)
 
 @application.route('/user/profile/')
 def user_profile():
@@ -121,8 +132,36 @@ def user_profile():
     closeDb()
     return render_template('user_profile.html', data=data, profile=True)
 
-@application.route('/user/cuti/', methods=['GET','POST'])
-def user_cuti():
+@application.route('/user/cuti/<nik>', methods=['GET','POST'])
+def user_cuti(nik):
+    if 'nik' not in session:
+        return redirect(url_for('user'))
+    if 'nia' in session:
+        return redirect(url_for('admin_dashboard'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
+    
+    nik = session['nik']
+    
+    openDb()
+    container = []
+    cursor.execute(f"SELECT * FROM cuti WHERE nik = '{nik}'")
+    result = cursor.fetchall()
+    for data in result:
+        container.append(data)
+    closeDb()
+
+    openDb()
+    cursor.execute(f"SELECT * FROM pegawai WHERE nik = '{nik}'")
+    data = cursor.fetchone()
+    closeDb()
+    
+    return render_template('user_cuti.html', cuti=True, container=container,data=data)
+
+@application.route('/user/cuti/pengajuan/<nik>', methods=['GET','POST'])
+def user_cuti_pengajuan(nik):
     if 'nik' not in session:
         return redirect(url_for('user'))
     if 'nia' in session:
@@ -133,6 +172,10 @@ def user_cuti():
         return redirect(url_for('admin_forgot_entry'))
     
     kode_cuti = generate_cuti()
+    openDb()
+    cursor.execute(f"SELECT * FROM pegawai WHERE nik = '{nik}'")
+    data = cursor.fetchone()
+    closeDb()
 
     if request.method == 'POST':
         nik = request.form['nik']
@@ -140,23 +183,36 @@ def user_cuti():
         tglawal = request.form['tglawal']
         tglakhir = request.form['tglakhir']
         alasan = request.form['alasan']
-        cuti = 12
+
+        # Calculate the number of leave days
+        start_date = datetime.datetime.strptime(tglawal, '%Y-%m-%d')
+        end_date = datetime.datetime.strptime(tglakhir, '%Y-%m-%d')
+        leave_days = (end_date - start_date).days + 1
 
         openDb()
+        cursor.execute("SELECT banyakcuti FROM pegawai WHERE nik = %s", (nik,))
+        current_cuti = cursor.fetchone()[0]
+
+        if current_cuti < leave_days:
+            closeDb()
+            return render_template('user_cuti_pengajuan.html', cuti=True, data=data, error="CUTI ANDA TIDAK MENCUKUPI!!!")
+
+        new_cuti_balance = current_cuti - leave_days
+
+        # Insert into cuti table
         sql = "INSERT INTO cuti (kode_cuti,nik,nama,tglawal,tglakhir,alasan) VALUES (%s,%s, %s, %s, %s, %s)"
         val = (kode_cuti,nik,nama,tglawal,tglakhir,alasan)
         cursor.execute(sql, val)
+
+        # Update the pegawai table
+        sql_update = "UPDATE pegawai SET banyakcuti = %s WHERE nik = %s"
+        cursor.execute(sql_update, (new_cuti_balance, nik))
+
         conn.commit()
         closeDb()
         return redirect(url_for('user'))        
     else:
-        nik = session['nik']
-        openDb()
-        cursor.execute(f"SELECT * FROM pegawai WHERE nik = '{nik}'")
-        data = cursor.fetchone()
-        closeDb()
-        
-        return render_template('user_cuti.html', cuti=True, data=data)
+        return render_template('user_cuti_pengajuan.html', cuti=True, data=data)
 
 # halaman pesan
 @application.route('/user/messages/')
@@ -170,6 +226,8 @@ def user_messages():
     if 'admin_forgot' in session:
         return redirect(url_for('admin_forgot_entry'))
     
+    nik = session['nik']
+    
     openDb()
     container = []
     cursor.execute(f"SELECT * FROM pesan ORDER BY tgl DESC")
@@ -177,7 +235,12 @@ def user_messages():
     for message in result:
         container.append(message)
     closeDb()
-    return render_template('user_messages.html', container=container, nik=session['nik'], messages=True)
+
+    openDb()
+    cursor.execute(f"SELECT * FROM pegawai WHERE nik = '{nik}'")
+    data = cursor.fetchone()
+    closeDb()
+    return render_template('user_messages.html', container=container, nik=session['nik'], messages=True, data=data)
 
 @application.route('/user/messages/<kode>/')
 def user_message(kode):
@@ -190,10 +253,16 @@ def user_message(kode):
     if 'admin_forgot' in session:
         return redirect(url_for('admin_forgot_entry'))
     
+    nik = session['nik']
+
+    openDb()
+    cursor.execute(f"SELECT * FROM pegawai WHERE nik = '{nik}'")
+    data = cursor.fetchone()
+    closeDb()
+    
     openDb()
     cursor.execute(f"SELECT * FROM pesan WHERE kode = '{kode}'")
     pesan = cursor.fetchone()
-    closeDb()
     if not pesan:
         return redirect(url_for('user_messages'))
     
@@ -201,24 +270,10 @@ def user_message(kode):
 
     # Check if the file column (pesan[6]) is empty
     if not pesan[6]:
-        return render_template('user_message.html', kosong=True, error='Tidak ada file terlampir' ,pesan=pesan, isi = isi, messages=True)
-    
-    return render_template('user_message.html', kosong=False, pesan=pesan, isi=isi, messages=True)
+        return render_template('user_message.html', kosong=True, error='Tidak ada file terlampir' ,pesan=pesan, isi = isi, messages=True, data=data)
 
-# contact page
-@application.route('/user/contact/')
-def user_contact():
-    if 'nik' not in session:
-        return redirect(url_for('user'))
-    if 'nia' in session:
-        return redirect(url_for('admin_dashboard'))
-    if 'user_forgot' in session:
-        return redirect(url_for('user_forgot_entry'))
-    if 'admin_forgot' in session:
-        return redirect(url_for('admin_forgot_entry'))
-    
-    # html unfinished
-    return render_template('contact.html', nik=session['nik'])   
+    closeDb()
+    return render_template('user_message.html', kosong=False, pesan=pesan, isi=isi, messages=True, data=data)
 
 @application.route('/user/logout/')
 def user_logout():
@@ -357,7 +412,6 @@ def admin_tambah_cuti():
     cursor.execute(sql, val)
     conn.commit()
     closeDb()
-    
     return redirect(url_for('admin_dashboard'))
 
 @application.route('/admin/login/', methods=['GET', 'POST'])
@@ -528,6 +582,11 @@ def admin_message(kode):
     if not pesan:
         return redirect(url_for('admin_messages'))
     isi = pesan[4].split("\n")
+
+    # Check if the file column (pesan[6]) is empty
+    if not pesan[6]:
+        return render_template('admin_message.html', kosong=True, error='Tidak ada file terlampir' ,pesan=pesan, isi = isi, messages=True)
+
     closeDb()
     return render_template('admin_message.html', pesan=pesan, isi=isi, messages=True)
 

@@ -13,7 +13,8 @@
         <a {% if home %}class="checked"{% endif %} href="/user">Home</a>
         <a {% if profile %}class="checked"{%endif%} href="/user/profile">Profile</a>
         <a {% if messages %}class="checked"{% endif %} href="/user/messages">Messages</a>
-        <a {% if cuti %}class="checked"{% endif %} href="/user/cuti">Cuti</a>
+        <a {% if cuti %}class="checked"{% endif %} href="/user/cuti/{{data[0]}}">Cuti</a>
+        <!-- <a {% if cuti %}class="checked"{% endif %} href="/user/cuti/pengajuan/{{data[0]}}">Cuti</a> -->
         <a href="/user/logout" onclick="return confirm('Anda yakin mau logout?')">Log Out</a>
     </div>
   
