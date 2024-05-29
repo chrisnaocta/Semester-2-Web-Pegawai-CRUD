@@ -348,10 +348,17 @@ def admin_cuti():
     
     return render_template('admin_cuti.html', cuti=True, container=container)
 
-@application.route('/admin/tambah/cuti/')
+@application.route('/admin/reset/cuti/')
 def admin_tambah_cuti():
+    cuti = 12
     openDb()
+    sql = "UPDATE pegawai SET banyakcuti=%s;"
+    val = (cuti)
+    cursor.execute(sql, val)
+    conn.commit()
     closeDb()
+    
+    return redirect(url_for('admin_dashboard'))
 
 @application.route('/admin/login/', methods=['GET', 'POST'])
 def admin_login():
