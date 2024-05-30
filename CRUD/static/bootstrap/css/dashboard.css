@@ -82,7 +82,7 @@
     font-size: 1.2em;
   }
 
-  .container td {
+  .container .profile-table td {
     padding: 0 10px;
   }
 
@@ -92,6 +92,13 @@
 
   td .profile-picture {
     padding-right: 10px;
+  }
+
+  .profile {
+    width: 75%;
+    padding: 20px;
+    border: #00181b 0.5px solid;
+    border-radius: 10px;
   }
   
   /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
