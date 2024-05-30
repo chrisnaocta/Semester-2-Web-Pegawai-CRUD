@@ -41,6 +41,18 @@
     margin-top: 20px;
   }
 
+  .container h1 {
+    font-size: 2.5em;
+    margin: 20px 0;
+    font-weight: 600;
+  }
+  
+  .container h2 {
+    font-size: 2em;
+    font-weight: 600;
+    margin-bottom: 0.7em;
+  }
+
   .container .tambah {
     margin-top: 30px;
   }
