@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/admin_dashboard.css') }}">
 
     {% if welcome %}
@@ -26,7 +25,9 @@
   <!-- Page content -->
   <div class="main">
     <div class="container">
+        <div class="heading">
         <h1>Data Admin</h1>
+    </div>
         <div class="profile">
             <table class="profile-table">
                 <tr>
