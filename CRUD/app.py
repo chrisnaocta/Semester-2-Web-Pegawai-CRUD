@@ -594,7 +594,7 @@ def admin_forgot_entry():
         confirm_pwd = request.form['confirm_password']
 
         if password != confirm_pwd:
-            return render_template('forgot_entry.html', error='Passwords do not match!')
+            return render_template('admin_forgot_entry.html', error='Passwords do not match!')
 
         hashed_password = generate_password_hash(password) #Hash the password
 
