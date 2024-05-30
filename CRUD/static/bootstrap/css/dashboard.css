@@ -55,7 +55,7 @@
     font-weight: 600;
   }
 
-  .container .welcome {
+  .container .title {
     font-size: 3.5em;
     margin: 10px 0;
     font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
@@ -82,8 +82,16 @@
     font-size: 1.2em;
   }
 
+  .container td {
+    padding: 0 10px;
+  }
+
   .page-item a {
     font-size: 1em;
+  }
+
+  td .profile-picture {
+    padding-right: 10px;
   }
   
   /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */

@@ -27,6 +27,7 @@
             <h1>Data Pegawai</h1>
             <table>
                 <tr>
+                    <td class="profile-picture" rowspan="7"><img src="{{ url_for('static', filename='images/' + data[0] + '.jpg') }}" alt="Foto {{ data[1] }}" height="15%"></td>
                     <td>NIK</td>
                     <td>:</td>
                     <td>{{ data[0] }}</td>
