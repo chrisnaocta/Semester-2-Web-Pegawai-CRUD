@@ -22,9 +22,8 @@ application.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://username:password@local
 db = SQLAlchemy(application)    
 mysql = MySQL(application)
 
-#fungsi untuk menyimpan lokasi foto
-#UPLOAD_FOLDER = 'E:\FILE OCTA\KULIAH\SEMESTER 2\WEB OOP\Web_Pegawai\CRUD\static\images'
-UPLOAD_FOLDER = 'static\images'
+#variabel untuk menyimpan lokasi foto
+UPLOAD_FOLDER = 'E:\FILE OCTA\KULIAH\SEMESTER 2\WEB OOP\Web_Pegawai\CRUD\static\images'
 application.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 #variabel untuk menyimpan lokasi file message
@@ -381,6 +380,70 @@ def admin_dashboard():
     admin = cursor.fetchone()
     closeDb()
     return render_template('admin_dashboard.html', container=container, admin=admin[0], home=True)
+
+@application.route('/admin/profile/')
+def admin_profile():
+    if 'nik' in session:
+        return redirect(url_for('user'))
+    if 'nia' not in session:
+        return redirect(url_for('admin_dashboard'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
+    
+    nia = session['nia']
+    openDb()
+    cursor.execute(f"SELECT * FROM admin WHERE nia = '{nia}'")
+    data = cursor.fetchone()
+    closeDb()
+    return render_template('admin_profile.html', data=data, profile=True)
+
+@application.route('/admin/edit/diri/<nia>', methods=['GET','POST'])
+def admin_edit(nia):
+    if 'nik' in session:
+        return redirect(url_for('user'))
+    if 'nia' not in session:
+        return redirect(url_for('admin_dashboard'))
+    if 'user_forgot' in session:
+        return redirect(url_for('user_forgot_entry'))
+    if 'admin_forgot' in session:
+        return redirect(url_for('admin_forgot_entry'))
+    nia = session['nia']
+
+    openDb()
+    cursor.execute('SELECT * FROM admin WHERE nia=%s', (nia))
+    data = cursor.fetchone()
+    if request.method == 'POST':
+        nama = request.form['nama']
+        email = request.form['email']
+
+        password = request.form['password']
+
+        confirm_pwd = request.form['confirm_password']
+
+        if password != confirm_pwd:
+            return render_template('admin_edit_diri.html',data=data, form_data=request.form, error='Passwords do not match!')
+
+        # Hash the password if provided, otherwise keep the existing one
+        if password:
+            hashed_password = generate_password_hash(password)
+        else:
+            hashed_password = data[2]  # Assuming data[8] is the password from the fetched data
+
+        sql = """
+        UPDATE admin
+        SET nama=%s, email=%s, password=%s
+        WHERE nia=%s
+        """
+        val = (nama, email, hashed_password, nia)
+        cursor.execute(sql, val)
+        conn.commit()
+        closeDb()
+        return redirect(url_for('admin_dashboard'))
+    else:
+        closeDb()
+        return render_template('admin_edit_diri.html', data=data)
 
 @application.route('/admin/cuti', methods=['GET','POST'])
 def admin_cuti():

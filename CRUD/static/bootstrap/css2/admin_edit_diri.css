@@ -1,0 +1,30 @@
+.container1
+{
+    margin-top: 100px;
+    margin-left: 120px;
+}
+
+.container
+{
+    display: flex;
+    align-items: flex-end;
+}       
+
+.card {
+    width: 100%;
+    max-width: 1042px;
+    height: 440px; /* Adjust the height as needed */
+}
+
+.password-input1
+{
+    margin-bottom: -30px;
+}
+
+.password-toggle-icon {
+    position: relative;
+    right: -790px;  /* Adjust this value to move the icon horizontally */
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #333;  /* Adjust the color as needed */
+}
