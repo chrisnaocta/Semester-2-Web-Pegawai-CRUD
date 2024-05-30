@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <!-- <link rel="stylesheet" href="adminlte/plugins/fontawesome-free/css/all.min.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='adminlte/plugins/fontawesome-free/css/all.min.css') }}">
+    <!-- Theme style -->
+    <!-- <link rel="stylesheet" href="../../dist/css/adminlte.min.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='adminlte/dist/css/adminlte.min_7.css') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css2/user_cuti.css') }}">
+    <title>Cuti</title>
+</head>
+<body>
+    <!-- Side navigation -->
+    <div class="sidenav">
+        <a {% if home %}class="checked"{% endif %} href="/user">Home</a>
+        <a {% if profile %}class="checked"{%endif%} href="/user/profile">Profile</a>
+        <a {% if messages %}class="checked"{% endif %} href="/user/messages">Messages</a>
+        <a {% if cuti %}class="checked"{% endif %} href="/user/cuti/{{data[0]}}">Cuti</a>
+        <a href="/user/logout" onclick="return confirm('Anda yakin mau logout?')">Log Out</a>
+    </div>
+
+    <div class="container">
+
+        <div class="card card-info">
+            <div class="card-header text-center">
+              <h3 class="card-title">Pengajuan cuti</h3>
+            </div>
+            <!-- /.card-header -->
+            
+            <!-- form start -->
+            <form class="form-horizontal" method="POST" action="/user/cuti/pengajuan/{{data[0]}}">
+              {% if error %}
+                <p style="font-size: 13px; margin-bottom: -17px; color: red; text-align: center; font-weight: bold;">{{error}}</p>
+              {% endif %}
+              <div class="card-body">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm-2 col-form-label">NIK</label>
+                  <div class="col-sm-10">
+                    <input type="text"class="form-control" id="nik" name="nik" value="{{data[0]}}" hidden>
+                    <input type="text" class="form-control" value="{{data[0]}}" maxlength="11" disabled readonly>
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 col-form-label">Nama</label>
+                  <div class="col-sm-10">
+                    <input type="text"class="form-control" id="nama" placeholder="Nama" name="nama" value="{{data[1]}}" hidden>
+                    <input type="text" class="form-control" value="{{data[1]}}" maxlength="11" disabled readonly>
+                  </div>
+                </div>
+                
+                <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 col-form-label">Awal cuti:</label>
+                  <div class="col-sm-10">
+                    <input type="date" name="tglawal" class="form-control"required>
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 col-form-label">Akhir cuti:</label>
+                  <div class="col-sm-10">
+                    <input type="date" name="tglakhir" class="form-control password-input1" required>
+                  </div>
+                </div>
+    
+                <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 col-form-label">Alasan</label>
+                  <div class="col-sm-10">
+                    <textarea class="form-control" rows="4" type="text" name="alasan" rows="4" cols="50" maxlength="200" placeholder="Alasan cuti" required></textarea>  
+                </div>
+                </div>
+    
+              </div>
+              <!-- /.card-body -->
+
+              <div class="card-footer text-center">
+                <button type="submit" class="btn btn-success" style="margin-top: 0px;">
+                    Submit
+                </button>
+                <button type="submit" class="btn btn-secondary" style="margin-top: 0px;">
+                    <a style="text-decoration: none; color: white;" href="/user/cuti/{{data[0]}}">Cancel</a>
+                </button>
+
+            </div>
+
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

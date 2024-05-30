@@ -33,6 +33,7 @@
       <a {% if home %}class="checked"{% endif %} href="/user">Home</a>
       <a {% if profile %}class="checked"{%endif%} href="/user/profile">Profile</a>
       <a {% if messages %}class="checked"{% endif %} href="/user/messages">Messages</a>
+      <a {% if cuti %}class="checked"{% endif %} href="/user/cuti/pengajuan/{{data[0]}}">Cuti</a>
       <a href="/user/logout" onclick="return confirm('Anda yakin mau logout?')">Log Out</a>
     </div>
     
@@ -94,7 +95,8 @@
                 {% if kosong %}
                   <p style="color: red; font-weight: bold;">{{error}}</p>
                 {% else %}
-                <a id="downloadLink" href="{{ url_for('download_file', filename=pesan[3] + '.pdf') }}" class="mailbox-attachment-name">
+                <!-- <a id="downloadLink" href="{{ url_for('download_file', filename=pesan[3] + '.pdf') }}" class="mailbox-attachment-name"> -->
+                <a id="downloadLink" href="{{ url_for('download_file', filename=pesan[3] + '.pdf')  }}" class="mailbox-attachment-name">
                   <i class="fas fa-paperclip"></i>{{ pesan[3] }}.pdf
                 </a>
                 {% endif %}    
@@ -115,22 +117,22 @@
     }
 
     // Get the download link element
-    const downloadLink = document.getElementById('downloadLink');
+    // const downloadLink = document.getElementById('downloadLink');
 
-    // Add click event listener
-    downloadLink.addEventListener('click', function() {
-      // Prevent the default behavior (navigating to "#")
-      event.preventDefault();
+    // // Add click event listener
+    // downloadLink.addEventListener('click', function() {
+    //   // Prevent the default behavior (navigating to "#")
+    //   event.preventDefault();
 
-      // Get the file name from the message data
-      const judul = '{{ pesan[3] }}';
+    //   // Get the file name from the message data
+    //   const judul = '{{ pesan[3] }}';
 
-      // Construct the file path with the file name
-      const filePath = `E:\\FILE OCTA\\KULIAH\\SEMESTER 2\\WEB OOP\\Web_Pegawai\\CRUD\\static\\files\\${judul}.pdf`;
+    //   // Construct the file path with the file name
+    //   const filePath = `E:\\FILE OCTA\\KULIAH\\SEMESTER 2\\WEB OOP\\Web_Pegawai\\CRUD\\static\\files\\${judul}.pdf`;
       
-      // Navigate to the file path
-      window.location.href = filePath;
-    });
+    //   // Navigate to the file path
+    //   window.location.href = filePath;
+    // });
 
 </script>
 

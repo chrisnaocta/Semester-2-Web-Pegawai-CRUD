@@ -26,6 +26,7 @@
         <a {% if home %}class="checked"{% endif %} href="/admin">Home</a>
         <a {% if profile %}class="checked"{% endif %} href="/admin/profile">Profile</a>
         <a {% if messages %}class="checked"{% endif %} href="/admin/messages">Messages</a>
+        <a {% if cuti %}class="checked"{% endif %} href="/admin/cuti">Cuti</a>
         <a href="/admin/logout" onclick="return confirm('Anda yakin mau logout?')">Log Out</a>
     </div>
   <div class="main">
@@ -218,14 +219,14 @@
                         
                 // Load the image and add it to the PDF document
                 var img = new Image();
-                img.src = `E:/FILE OCTA/KULIAH/SEMESTER 2/WEB OOP/Web_Pegawai/crud/static/images/${data.foto}`; // Adjust the URL to the correct path
+                img.src = `E:\\FILE OCTA\\KULIAH\\SEMESTER 2\\WEB OOP\\Web_Pegawai\\crud\\static\\images\\${data.foto}`; // Adjust the URL to the correct path
                 img.onload = function() {
                     var canvas = document.createElement('canvas');
                     var ctx = canvas.getContext('2d');
                     canvas.width = img.width;
                     canvas.height = img.height;
                     ctx.drawImage(img, 0, 0);
-                    var imgData = canvas.toDataURL('E:/FILE OCTA/KULIAH/SEMESTER 2/WEB OOP/Web_Pegawai/crud/static/images/');
+                    var imgData = canvas.toDataURL('E:\\FILE OCTA\\KULIAH\\SEMESTER 2\\WEB OOP\\Web_Pegawai\\crud\\static\\images');
                     doc.addImage(imgData, 'JPG', 20, 110, 50, 50); // Adjust dimensions as needed
                     
                     // Save the PDF

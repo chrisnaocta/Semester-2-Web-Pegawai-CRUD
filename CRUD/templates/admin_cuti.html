@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Messages</title>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/admin_dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css2/admin_cuti.css') }}">
+
     <!-- Tambahkan jsPDF Library -->
     <script src="{{ url_for('static', filename='js/jspdf.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jspdf.plugin.autotable.min.js') }}"></script>
@@ -17,10 +18,17 @@
             width: 100%;
             border-collapse: collapse;
         }
-        th {
+        th
+        {
             text-align: center;
         }
+        /* td
+        {
+            text-align: center;
+        } */
     </style>
+
+    <title>Document</title>
 </head>
 <body>
     <!-- Side navigation -->
@@ -31,51 +39,55 @@
         <a {% if cuti %}class="checked"{% endif %} href="/admin/cuti">Cuti</a>
         <a href="/admin/logout" onclick="return confirm('Anda yakin mau logout?')">Log Out</a>
     </div>
-  <div class="main">
-    <div class="container">
-        <h1>Messages</h1>
-        <table class="table table-bordered table-hover">
-            <thead>
-                <tr>
-                    <th width="10%">Date</th>
-                    <th>Title</th>
-                    <th width="20%">Author</th>
-                    <th width="10%"></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in container %}
-                <tr>
-                    <td>{{ row[2].strftime('%d/%m/%Y') }}</td>
-                    <td><a href="{{ row[0] }}">{{ row[3] }}</a></td>
-                    <td>{{ row[1] }}</td>
-                    <td>
-                        <div class="btn-group" role="group">
-                            <a href="/admin/messages/edit/{{row[0]}}" class="btn btn-warning" role="button">Edit</a>
-                            <a href="/admin/messages/hapus/{{row[0]}}" class="btn btn-danger" role="button" onclick="return confirm('Apakah Anda yakin ingin menghapus pesan ini?')">Delete</a>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        
-        <!-- Pagination -->
-        <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-center">
-                <li class="page-item" id="previous"><a class="page-link" href="#">Sebelumnya</a></li>
-                <li class="page-item" id="page1"><button class="page-link btn btn-link">1</button></li>
-                <li class="page-item" id="page2"><button class="page-link btn btn-link">2</button></li>
-                <li class="page-item" id="page3"><button class="page-link btn btn-link">3</button></li>
-                <li class="page-item" id="next"><a class="page-link" href="#">Selanjutnya</a></li>
-            </ul>
-        </nav>
-        <a class="right btn btn-primary" href="/admin/tambah_pesan">Tambah Pesan Baru</a>
-    </div>
-  </div>
-    
-  <script>
-      var currentPage = 1;
+
+    <div class="main">
+        <div class="container">
+            <h1>Cuti Karyawan</h1>
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th width="3%">Nik</th>
+                        <th width="5%">Nama</th>
+                        <th width="5%">Tanggal awal cuti</th>
+                        <th width="5%">Tanggal akhir cuti</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in container %}
+                    <tr>
+                        <td style="text-align: center;">{{ row[1] }}</td>
+                        <td>{{ row[2] }}</td>
+                        <td>{{ row[3].strftime('%A, %d-%m-%Y') }}</td>
+                        <td>{{ row[4].strftime('%A, %d-%m-%Y') }}</td>
+                            <!-- <div class="btn-group" role="group">
+                                <a href="/admin/messages/edit/{{row[0]}}" class="btn btn-warning" role="button">Edit</a>
+                                <a href="/admin/messages/hapus/{{row[0]}}" class="btn btn-danger" role="button" onclick="return confirm('Apakah Anda yakin ingin menghapus pesan ini?')">Delete</a>
+                            </div> -->
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <!-- Pagination -->
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" id="previous"><a class="page-link" href="#">Sebelumnya</a></li>
+                    <li class="page-item" id="page1"><button class="page-link btn btn-link">1</button></li>
+                    <li class="page-item" id="page2"><button class="page-link btn btn-link">2</button></li>
+                    <li class="page-item" id="page3"><button class="page-link btn btn-link">3</button></li>
+                    <li class="page-item" id="next"><a class="page-link" href="#">Selanjutnya</a></li>
+                </ul>
+            </nav>
+            <a class="right btn btn-primary" href="/admin/reset/cuti" onclick="return confirm('Anda yakin mau reset cuti semua karyawan??')">
+                Reset cuti semua karyawan
+            </a>
+        </div>
+      </div>
+</body>
+
+<script>
+    var currentPage = 1;
       var itemsPerPage = 7;
       var totalRows = document.querySelectorAll('tbody tr').length;
 
@@ -146,6 +158,6 @@
           displayData(currentPage);
           updatePaginationButtons();
       });
-  </script>
-</body>
+</script>
+
 </html>
