@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Tambah Pesan</title>
+    <title>Edit Pesan</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css2/admin_dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
@@ -31,16 +31,57 @@
     </div>
   <div class="main">
     <div class="container">
-        <form action="#" method="POST" enctype="multipart/form-data">
-            <input type="text" name="judul" id="judul" value="{{ pesan[3] }}" required>
-            <br>
-            <textarea name="isi" id="isi" cols="80" rows="15"required>{{ pesan[4] }}</textarea>
-            <p>Max: 4000 characters</p>
-            <div class="submit-box">
-                <input type="submit" class="btn btn-primary" value="Simpan">
-                <a href="/admin/messages" class="btn btn-secondary">Batal</a>
+        <div class="card card-info tambah">
+            <div class="card-header text-center">
+              <h3 class="card-title">Edit Pesan</h3>
             </div>
-        </form>
+            <!-- /.card-header -->
+            
+            <!-- form start -->
+            <form class="form-horizontal" method="POST" action="#">
+              {% if error %}
+                <p style="font-size: 13px; margin-bottom: -17px; color: red; text-align: center; font-weight: bold;">{{error}}</p>
+              {% endif %}
+              <div class="card-body">
+
+                <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 col-form-label">Judul:</label>
+                  <div class="col-sm-10">
+                    <input type="text"class="form-control" id="judul" maxlength="150" name="judul" value="{{ pesan[3] }}" placeholder="Judul">
+                  </div>
+                </div>
+    
+                <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 col-form-label">Isi Pesan:</label>
+                  <div class="col-sm-10">
+                    <textarea class="form-control" rows="4" type="text" name="isi" rows="4" cols="50" maxlength="4000" placeholder="Isi Pesan" required>{{ pesan[4] }}</textarea>  
+                </div>
+                </div>
+                
+    
+                <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 col-form-label">Attachment:</label>
+                  <div class="col-sm-10">
+                    <input style="margin-bottom: 10px ;"type="file" name="file" accept=".pdf,.docx">
+                </div>
+                </div>
+    
+              </div>
+              <!-- /.card-body -->
+
+              <div class="card-footer text-center">
+                <button type="submit" class="btn btn-success" style="margin-top: 0px;">
+                    Submit
+                </button>
+                <button type="submit" class="btn btn-secondary" style="margin-top: 0px;">
+                    <a style="text-decoration: none; color: white;" href="/admin/messages">Cancel</a>
+                </button>
+
+            </div>
+
+            </form>
+        </div>
+    </div>
     </div>
   </div>
 </body>

@@ -714,8 +714,18 @@ def admin_edit_pesan(kode):
         tgl = datetime.date.today()
         judul = request.form['judul']
         isi = request.form['isi']
+        email = admin[3]
+        file = request.form['judul']
 
-        sql = f"UPDATE pesan SET author='{author}', tgl='{tgl}', judul='{judul}', isi='{isi}', edited='1' WHERE kode='{kode}'"
+        # Check if a new file is uploaded
+        if 'file' in request.files and request.files['file'].filename != '':
+            file = request.files['file']
+            file.save(os.path.join(application.config['UPLOAD_FOLDER2'], f"{judul}.pdf"))
+            file_name = f"{judul}.pdf"
+        else:
+            file_name = ""
+
+        sql = f"UPDATE pesan SET author='{author}', tgl='{tgl}', judul='{judul}', isi='{isi}', email='{email}', file='{file_name}' WHERE kode ='{kode}'"
         cursor.execute(sql)
         conn.commit()
         closeDb()
