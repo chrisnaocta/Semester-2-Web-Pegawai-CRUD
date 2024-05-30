@@ -83,17 +83,41 @@
   }
 
   .container .profile-table td {
-    padding: 0 10px;
+    padding-right: 20px;
   }
+
+  .container .profile-table td img {
+    padding-right: 10px;
+  }
+
+
 
   .page-item a {
     font-size: 1em;
   }
 
+  .line {
+    border: #272727 0.2px solid;
+    margin-top: -10px;
+    margin-bottom: 20px;
+    width: 300px;
+  }
+
+  .topborder {
+    border: #17A2B8 3px solid;
+    margin-top: -10px;
+  }
+
+  .heading {
+    margin: 30px 0;
+  }
+
   .profile {
-    width: 75%;
-    padding: 20px;
-    border: #00181b 0.5px solid;
+    max-width: 700px;
+    padding: 25px;
+    border: #ababab 0.5px solid;
+    border-left: #17A2B8 4px solid;
+    border-bottom: #17A2B8 4px solid;
     border-radius: 10px;
   }
   

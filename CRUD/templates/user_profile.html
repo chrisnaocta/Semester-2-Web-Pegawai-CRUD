@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/dashboard.css') }}">
     
-    <title>Profile</title>\
+    <title>Profile</title>
 </head>
 <body>
     <!-- Side navigation -->
@@ -21,11 +21,14 @@
   <!-- Page content -->
   <div class="main">
     <div class="container">
+        <div class="heading">
         <h1>Data Pegawai</h1>
+        </div>
+        <div class="line"></div>
         <div class="profile">
             <table class="profile-table">
                 <tr>
-                    <td class="profile-picture" rowspan="7"><img src="{{ url_for('static', filename='images/' + data[0] + '.jpg') }}" alt="Foto {{ data[1] }}" height="15%"></td>
+                    <td class="photo" rowspan="7"><img src="{{ url_for('static', filename='images/' + data[0] + '.jpg') }}" alt="Foto {{ data[1] }}" height="15%"></td>
                     <td>NIK</td>
                     <td>:</td>
                     <td>{{ data[0] }}</td>
