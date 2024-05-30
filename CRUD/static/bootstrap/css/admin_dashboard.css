@@ -32,13 +32,24 @@
   }
   
   /* Style page content */
-  .main {
-    margin-left: 160px; /* Same as the width of the sidebar */
+  .container {
+    margin-top: 1rem;
+    margin-left: 18%; /* Same as the width of the sidebar */
+    width: auto;
+    height: auto;
+    min-height: 10em;
     padding: 0px 10px;
+    flex-direction: column;
+    justify-content: space-around;
+    border: #111 1px;
   }
 
   .container {
-    margin-top: 20px;
+    font-size: larger;
+  }
+
+  .container .data-pegawai{
+    font-size:medium;
   }
 
   .container h1 {
@@ -46,17 +57,63 @@
     margin: 20px 0;
     font-weight: 600;
   }
-  
+
+  .container .title {
+    font-size: 3.5em;
+    margin: 10px 0;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: #00181b;
+    /*font-weight: bold;*/
+  }
+
   .container h2 {
     font-size: 2em;
     font-weight: 600;
     margin-bottom: 0.7em;
   }
 
+  .container .item {
+    margin: 1.5em 0;
+  }
+
+  .container .date{
+    font-size: 0.9.5em;
+    color:#303030;
+  }
+
+  .container .links {
+    font-size: 1.2em;
+  }
+
+  .container .profile-table td {
+    padding-right: 20px;
+  }
+
+  .container .profile-table td img {
+    padding-right: 10px;
+  }
+
   .container .tambah {
     margin-top: 30px;
   }
+
+  .container .profile-table td {
+    padding-right: 20px;
+  }
+
+  .profile {
+    max-width: 700px;
+    padding: 25px;
+    border: #ababab 0.5px solid;
+    border-left: #DC3545 4px solid;
+    border-bottom: #DC3545 4px solid;
+    border-radius: 10px;
+  }
   
+  .heading {
+    margin: 30px 0;
+  }
+
   /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
   @media screen and (max-height: 450px) {
     .sidenav {padding-top: 15px;}
